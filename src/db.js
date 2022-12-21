@@ -21,51 +21,51 @@ const pool = new Pool({
 
 
 
-const { Client } = require('pg')
+// const { Client } = require('pg')
  
-const client = new Client({
-  host: 'containers-us-west-159.railway.app',
-  port: 6528,
-  user: 'postgres',
-  password: 'dqkNHBBFJa3Htsw6cpB6',
-})
+// const client = new Client({
+//   host: 'containers-us-west-159.railway.app',
+//   port: 6528,
+//   user: 'postgres',
+//   password: 'dqkNHBBFJa3Htsw6cpB6',
+// })
 
 
-client.connect((err) => {
-  if (err) {
-    console.error('connection error', err.stack)
-  } else {
-    console.log('connected')
-  }
-})
-// let sequelize =
-//   process.env.NODE_ENV === "production"
-//     ? new Sequelize({
-//         database: DB_NAME,
-//         dialect: "postgres",
-//         host: DB_HOST, 
-//         port: 5432,
-//         username: DB_USER,
-//         password: DB_PASSWORD,
-//         pool: {
-//           max: 3,
-//           min: 1,
-//           idle: 10000,
-//         },
-//         dialectOptions: {
-//           ssl: {
-//             require: true,
-//             // Ref.: https://github.com/brianc/node-postgres/issues/2009
-//             rejectUnauthorized: false,
-//           },
-//           keepAlive: true,
-//         },
-//         ssl: true,
-//       })
-//     : new Sequelize(
-//         `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/glove`,
-//         { logging: false, native: false }
-//       );
+// client.connect((err) => {
+//   if (err) {
+//     console.error('connection error', err.stack)
+//   } else {
+//     console.log('connected')
+//   }
+// })
+let sequelize =
+  process.env.NODE_ENV === "production"
+    ? new Sequelize({
+        database: 'railway',
+        dialect: "postgres",
+        host: 'containers-us-west-159.railway.app', 
+        port: 6528,
+        username: 'postgres',
+        password: 'dqkNHBBFJa3Htsw6cpB6',
+        pool: {
+          max: 3,
+          min: 1,
+          idle: 10000,
+        },
+        dialectOptions: {
+          ssl: {
+            require: true,
+            // Ref.: https://github.com/brianc/node-postgres/issues/2009
+            rejectUnauthorized: false,
+          },
+          keepAlive: true,
+        },
+        ssl: true,
+      })
+    : new Sequelize(
+        'postgres://postgres:dqkNHBBFJa3Htsw6cpB6@containers-us-west-159.railway.app/railway',
+        { logging: false, native: false }
+      );
 
 
 const basename = path.basename(__filename);

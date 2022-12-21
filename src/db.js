@@ -41,12 +41,12 @@ const pool = new Pool({
 let sequelize =
   process.env.NODE_ENV === "production"
     ? new Sequelize({
-        database: PGDATABASE,
+        database: 'railway',
         dialect: "postgres",
-        host: PGHOST, 
-        port: PGPORT,
-        username: PGUSER,
-        password: PGPASSWORD,
+        host: 'containers-us-west-159.railway.app', 
+        port: 6528,
+        username: 'postgres',
+        password: 'dqkNHBBFJa3Htsw6cpB6',
         pool: {
           max: 3,
           min: 1,
@@ -63,7 +63,7 @@ let sequelize =
         ssl: true,
       })
     : new Sequelize(
-        `postgres://${PGUSER}:${PGPORT}@${PGHOST}/${PGDATABASE}`,
+        'postgres://postgres:dqkNHBBFJa3Htsw6cpB6@$containers-us-west-159.railway.app/railway',
         { logging: false, native: false }
       );
 

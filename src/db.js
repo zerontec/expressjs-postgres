@@ -21,15 +21,6 @@ const pool = new Pool({
 
 
 
-const { Client } = require('pg')
- 
-const client = new Client({
-  host: 'containers-us-west-159.railway.app',
-  port: 6528,
-  user: 'postgres',
-  password: 'dqkNHBBFJa3Htsw6cpB6',
-})
-
 
 client.connect((err) => {
   if (err) {

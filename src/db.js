@@ -21,32 +21,32 @@ const pool = new Pool({
 
 
 
-// const { Client } = require('pg')
+const { Client } = require('pg')
  
-// const client = new Client({
-//   host: 'containers-us-west-159.railway.app',
-//   port: 6528,
-//   user: 'postgres',
-//   password: 'dqkNHBBFJa3Htsw6cpB6',
-// })
+const client = new Client({
+  host: 'containers-us-west-159.railway.app',
+  port: 6528,
+  user: 'postgres',
+  password: 'dqkNHBBFJa3Htsw6cpB6',
+})
 
 
-// client.connect((err) => {
-//   if (err) {
-//     console.error('connection error', err.stack)
-//   } else {
-//     console.log('connected')
-//   }
-// })
+client.connect((err) => {
+  if (err) {
+    console.error('connection error', err.stack)
+  } else {
+    console.log('connected')
+  }
+})
 let sequelize =
   process.env.NODE_ENV === "production"
     ? new Sequelize({
-        database: 'railway',
+        database: PGDATABASE,
         dialect: "postgres",
-        host: 'containers-us-west-159.railway.app', 
-        port: 6528,
-        username: 'postgres',
-        password: 'dqkNHBBFJa3Htsw6cpB6',
+        host: PGHOST, 
+        port: PGPORT,
+        username: PGUSER,
+        password: PGPASSWORD,
         pool: {
           max: 3,
           min: 1,
@@ -63,7 +63,7 @@ let sequelize =
         ssl: true,
       })
     : new Sequelize(
-        'postgres://postgres:dqkNHBBFJa3Htsw6cpB6@$containers-us-west-159.railway.app/railway',
+        `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`,
         { logging: false, native: false }
       );
 

@@ -31,14 +31,6 @@ asesor:{
     allowNull:false
 
 }, 
-image:{
-
-    type:DataTypes.STRING,
-},
-disable: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-}
 
 
 

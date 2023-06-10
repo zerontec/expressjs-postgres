@@ -23,16 +23,16 @@ const server = require('./src/app.js');
 const { conn } = require('./src/db.js');
 
 
-const {  defaultAdminAndRoles } = require('./src/dbLoad/loadUser.js');
+// const {  defaultAdminAndRoles } = require('../api/src/dbLoad/loadUser');
 
 const port = process.env.PORT || 5040;
 
 
   // Syncing all the models at once.
-  conn.sync({ force: true }).then(() => {
+  conn.sync({ force: false }).then(() => {
     server.listen(port, () => {
       console.log('o|O_O|o robot Σωκράτης listening at 5040');
-  defaultAdminAndRoles();
+  // defaultAdminAndRoles();
     });
   
   });

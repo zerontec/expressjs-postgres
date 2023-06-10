@@ -41,7 +41,7 @@ const getAllUser = async (req, res, next) => {
 
     return users
       ? res.status(200).send({ users })
-      : res.status(404).send({ message: "No Found Data" });
+      : res.status(404).send({ message: "No se ENcontro Informacion" });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -67,12 +67,20 @@ const getUser = async (req, res, next) => {
       },
     });
     return user
-      ? res.status(200).send({ user, message: "Usuario encontrado" })
-      : res.status(404).send({ message: "Usuario no Encontrado" });
+      ? res.status(200).send({ user, message: "User Find" })
+      : res.status(404).send({ message: "User not found" });
   } catch (err) {
-    res.status(500).send(err, "Algo salio mal ");
+    res.status(500).send(err, "something went wrong");
   }
 };
+
+
+
+
+
+
+
+
 
 /**
  * It finds a user by their primary key and sends the user back to the client.
@@ -86,8 +94,8 @@ const putUser = async (req, res, next) => {
     const user = await User.findByPk(req.params.id);
     if (user) {
       user.update(req.body);
-      res.status(201).send({ user, message: "usuario Actualizado" });
-    } else res.status(400).send({ message: "Usuario no Encontrado" });
+      res.status(201).send({ user, message: "User update" });
+    } else res.status(400).send({ message: "User no Found" });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -110,9 +118,9 @@ const deleteUser = async (req, res, next) => {
     });
     if (user) {
       await user.destroy();
-      res.status(200).send({ message: "Usuario Borrado" });
+      res.status(200).send({ message: "user has been deleted" });
     } else {
-      res.status(400).send({ message: "usuario no encontrado" });
+      res.status(400).send({ message: "User no Found" });
     }
   } catch (err) {
     res.status(500).send(err);
@@ -130,12 +138,12 @@ const searchUser = async (req, res, next) => {
       where: { email},
     });
     if (datEmail) {
-      res.status(200).send({ datEmail, message: "Email encontrado" });
+      res.status(200).send({ datEmail, message: "Email find" });
     } else {
-      res.status(404).send({ message: "Email no encontrado" });
+      res.status(404).send({ message: "Email no Found" });
     }
   } catch (err) {
-    res.status(500).send({ err, message: "Error en busqueda" });
+    res.status(500).send({ err, message: "Erron in search" });
   }
 };
 

@@ -73,49 +73,155 @@ sequelize.models = Object.fromEntries(capsEntries);
 // En sequelize.models están todos los modelos importados como propiedades
 // Para relacionarlos hacemos un destructuring
 
-const { User,Propiedad, Services, Role, Review, Rating, PurcharseOrder, buyServices } = sequelize.models;
-const ROLES = ['admin', 'usergl','usertl']
+const {
+  NotaCredito,
+  ProductoDevuelto,
+  DevolucionesVentas,
+  InvoiceProduct,
+  InvoiceFactura,
+  AccountsReceivable,
+  Customer,
+  Seller,
+  AccountPayable,
+  Invoice,
+  Alert,
+  Store,
+  Supplier,
+  Purchase,
+  Product,
+  Inventory,
+  User,
+  Propiedad,
+  Services,
+  Role,
+  Review,
+  Rating,
+  PurcharseOrder,
+  buyServices,
+} = sequelize.models;
+const ROLES = ["admin", "usergl", "usertl"];
 
-
-//User.hasMany(Shopping_cart, {as:"shopping_cart", foreignKey: 'user_id'});
-// Shopping_cart.belongsTo(User, {as:"user"});
-
-// User.hasMany(PurchaseOrder)
-// PurchaseOrder.belongsToMany(User, {through: 'user_purchase_order'})
-
-// Artwork.hasMany(Review);
-// Review.belongsTo(Artwork);
-
-// User.hasMany(Process_payment);
-// Process_payment.belongsTo(User, {through: 'user_process_payment'});
-
-// Artwork.belongsToMany(Rating, {through: 'artwork_rating'});
-// Rating.belongsToMany(Artwork, {through: 'artwork_rating'});
-// Rating.belongsToMany(User, {through: 'user_rating'});
-// User.belongsToMany(Rating, {through: 'user_rating'});
-
-
-// Shopping_cart.belongsToMany(Artwork, { through: 'Shopping_cart_artwork' });
-// Artwork.belongsToMany(Shopping_cart, { through: 'Shopping_cart_artwork' });
-// Artwork.belongsToMany(Type, {through: 'artwork_type'});
-// Type.belongsToMany(Artwork, {through: 'artwork_type'});
 Role.belongsToMany(User, {
   through: "user_roles",
   foreignKey: "roleId",
-  otherKey: "userId"
+  otherKey: "userId",
 });
 User.belongsToMany(Role, {
   through: "user_roles",
   foreignKey: "userId",
   otherKey: "roleId",
 });
-// User.hasMany(Propiedad,{through:"user_Propiedad"} );
-// Pripiedad.belongsToMany(User,{through:"propiedad_User"})
-// RefreshToken.belongsTo(User,{ foreignKey: 'userId', targetKey: 'id'})
-// User.hasOne(RefreshToken, {foreignKey: 'userId', targetKey: 'id'})
 
+Product.hasOne(Inventory, { foreignKey: "productId", as: "productInventory" });
+Inventory.belongsTo(Product, { foreignKey: "productId" });
+
+// Asociación entre Product e Purchase
+Product.hasMany(Purchase, { foreignKey: "productId", as: "productPurchases" });
+Purchase.belongsTo(Product, { foreignKey: "productId" });
+
+Purchase.hasMany(Product, { as: 'products' });
+Product.belongsTo(Purchase, { as: 'purchase' });
+
+
+// Asociación entre Supplier y Purchase
+Supplier.hasMany(Purchase, { as: "supplierPurchases" });
+Purchase.belongsTo(Supplier);
+
+// Relación entre Producto, Inventario y Tienda
+Product.belongsToMany(Store, { through: Inventory, as: "productStores" });
+Store.belongsToMany(Product, { through: Inventory, as: "storeProducts" });
+
+// Relación con el modelo de Inventario
+Alert.belongsTo(Inventory, {
+  foreignKey: "productId",
+  onDelete: "CASCADE",
+});
+
+// Relación entre Invoice (Factura) y Supplier (Proveedor)
+Invoice.belongsTo(Supplier);
+
+// Relación entre Invoice (Factura) y Purchase (Compra)
+Invoice.belongsTo(Purchase);
+
+// Relación entre Purchase (Compra) y AccountsPayable (Cuentas por Pagar)
+Purchase.hasMany(AccountPayable);
+AccountPayable.belongsTo(Purchase);
+
+// Relación entre AccountPayable (Cuentas por Pagar) y Supplier (Proveedor)
+AccountPayable.belongsTo(Supplier);
+
+Customer.hasMany(InvoiceFactura, { foreignKey: "customerId" });
+Seller.hasMany(InvoiceFactura, { foreignKey: "sellerId" });
+
+Invoice.belongsTo(Customer, { foreignKey: "customerId" });
+Invoice.belongsTo(Seller, { foreignKey: "sellerId" });
+
+Customer.hasMany(AccountsReceivable, { foreignKey: "customerId" });
+AccountsReceivable.belongsTo(Customer, { foreignKey: "customerId" });
+
+InvoiceFactura.hasOne(AccountsReceivable, { foreignKey: "invoiceId" });
+
+InvoiceFactura.belongsTo(AccountsReceivable, {
+  foreignKey: "accountsReceivableId",
+});
+
+AccountsReceivable.belongsTo(InvoiceFactura, {
+  foreignKey: "invoiceFacturaId",
+});
+
+// Customer.hasMany(Purchase);
+// Purchase.belongsTo(Customer);
+Inventory.belongsTo(Supplier, {
+  foreignKey: "supplierId",
+  as: "supplier",
+});
+
+Supplier.hasMany(Inventory, {
+  foreignKey: "supplierId",
+  as: "inventory",
+});
+
+Store.hasMany(Inventory, { foreignKey: "storeId", onDelete: "CASCADE" });
+Inventory.belongsTo(Store, { foreignKey: "storeId" });
+
+// Relaciones
+InvoiceFactura.belongsTo(Seller, { foreignKey: "sellerIdId" });
+InvoiceFactura.belongsTo(Customer, { foreignKey: "customerId" });
+InvoiceFactura.belongsToMany(Product, {
+  through: InvoiceProduct,
+  as: "products",
+});
+
+Product.belongsTo(InvoiceFactura, { foreignKey: "invoiceFacturaId" });
+InvoiceFactura.hasMany(Product, {
+  foreignKey: "invoiceFacturaId",
+  as: "productos",
+});
+// Relaciones con otros modelos
+DevolucionesVentas.belongsTo(InvoiceFactura, {
+  foreignKey: "invoiceFacturaId",
+});
+
+DevolucionesVentas.hasMany(ProductoDevuelto, {
+  as: "productosDevueltos",
+  foreignKey: "devolucionVentaId",
+});
+
+ProductoDevuelto.belongsTo(DevolucionesVentas, {
+  foreignKey: "devolucionVentaId",
+});
+
+NotaCredito.belongsTo(Customer, { foreignKey: "clienteId" }); // Reemplaza 'Cliente' con el modelo correspondiente a tu entidad de Cliente
+// // Definir las relaciones con otros modelos
+// InvoiceProduct.belongsTo(Product, { foreignKey: 'productId' });
+// InvoiceProduct.belongsTo(InvoiceFactura, { foreignKey: 'invoiceId' });
+
+// Relaciones con otros modelos
+// InvoiceFactura.hasMany(InvoiceProduct, { as: 'invoiceProducts', foreignKey: 'invoiceFacturaId' });
+// InvoiceProduct.belongsTo(InvoiceFactura, { as: 'invoiceFactura', foreignKey: 'invoiceFacturaId' });
 module.exports = {
-  ...sequelize.models, 
-  conn: sequelize,  
-  ROLES   
+  ...sequelize.models,
+  conn: sequelize,
+  ROLES,
+  sequelize,
 };

@@ -2,33 +2,44 @@ require("dotenv").config();
 const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
+const {
+  PGDATABASE, PGHOST, PGPASSWORD, PGPORT, PGUSER
+} = process.env;
 
 // const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/gallery`, {
 //   logging: false, // set to console.log to see the raw SQL queries
 //   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
 // });
+const  pg = require("pg");
+const { Pool } = require('pg')
+ 
+const pool = new Pool({
+  host: 'localhost',
+  user: 'database-user',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+})
+
+// Connect to the database using the DATABASE_URL environment
+//   variable injected by Railway
+
+
+
 
 let sequelize =
   process.env.NODE_ENV === "production"
     ? new Sequelize({
-        database: DB_NAME,
+        database: PGDATABASE,
         dialect: "postgres",
-        host: DB_HOST,
-        port: 5432,
-        username: DB_USER,
-        password: DB_PASSWORD,
+        host: PGHOST, 
+        port: PGPORT,
+        username: PGUSER,
+        password: PGPASSWORD,
         pool: {
           max: 3,
           min: 1,
           idle: 10000,
-        },
-
-        pool: {
-          max: 5, // Número máximo de conexiones en el pool
-          min: 0, // Número mínimo de conexiones en el pool
-          acquire: 30000, // Tiempo máximo en milisegundos para adquirir una conexión
-          idle: 10000, // Tiempo máximo en milisegundos que una conexión puede estar inactiva antes de ser liberada
         },
         dialectOptions: {
           ssl: {
@@ -41,9 +52,10 @@ let sequelize =
         ssl: true,
       })
     : new Sequelize(
-        `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/munecadb`,
+        `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`,
         { logging: false, native: false }
       );
+
 
 const basename = path.basename(__filename);
 

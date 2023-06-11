@@ -1,40 +1,34 @@
-require('dotenv').config();
-const { Sequelize } = require('sequelize');
-const fs = require('fs');
-const path = require('path');
-const {
-  PGDATABASE, PGHOST, PGPASSWORD, PGPORT, PGUSER
-} = process.env;
-const  pg = require("pg");
-const { Pool } = require('pg')
- 
-const pool = new Pool({
-  host: 'localhost',
-  user: 'database-user',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-})
+require("dotenv").config();
+const { Sequelize } = require("sequelize");
+const fs = require("fs");
+const path = require("path");
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
 
-// Connect to the database using the DATABASE_URL environment
-//   variable injected by Railway
-
-
-
+// const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/gallery`, {
+//   logging: false, // set to console.log to see the raw SQL queries
+//   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
+// });
 
 let sequelize =
   process.env.NODE_ENV === "production"
     ? new Sequelize({
-        database: PGDATABASE,
+        database: DB_NAME,
         dialect: "postgres",
-        host: PGHOST, 
-        port: PGPORT,
-        username: PGUSER,
-        password: PGPASSWORD,
+        host: DB_HOST,
+        port: 5432,
+        username: DB_USER,
+        password: DB_PASSWORD,
         pool: {
           max: 3,
           min: 1,
           idle: 10000,
+        },
+
+        pool: {
+          max: 5, // Número máximo de conexiones en el pool
+          min: 0, // Número mínimo de conexiones en el pool
+          acquire: 30000, // Tiempo máximo en milisegundos para adquirir una conexión
+          idle: 10000, // Tiempo máximo en milisegundos que una conexión puede estar inactiva antes de ser liberada
         },
         dialectOptions: {
           ssl: {
@@ -47,27 +41,32 @@ let sequelize =
         ssl: true,
       })
     : new Sequelize(
-        `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`,
+        `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/munecadb`,
         { logging: false, native: false }
       );
-
 
 const basename = path.basename(__filename);
 
 const modelDefiners = [];
 
 // Leemos todos los archivos de la carpeta Models, los requerimos y agregamos al arreglo modelDefiners
-fs.readdirSync(path.join(__dirname, '/models'))
-  .filter((file) => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
+fs.readdirSync(path.join(__dirname, "/models"))
+  .filter(
+    (file) =>
+      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+  )
   .forEach((file) => {
-    modelDefiners.push(require(path.join(__dirname, '/models', file)));
+    modelDefiners.push(require(path.join(__dirname, "/models", file)));
   });
 
 // Injectamos la conexion (sequelize) a todos los modelos
-modelDefiners.forEach(model => model(sequelize));
+modelDefiners.forEach((model) => model(sequelize));
 // Capitalizamos los nombres de los modelos ie: product => Product
 let entries = Object.entries(sequelize.models);
-let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
+let capsEntries = entries.map((entry) => [
+  entry[0][0].toUpperCase() + entry[0].slice(1),
+  entry[1],
+]);
 sequelize.models = Object.fromEntries(capsEntries);
 
 // En sequelize.models están todos los modelos importados como propiedades
@@ -112,8 +111,8 @@ User.belongsToMany(Role, {
   otherKey: "roleId",
 });
 
-Product.hasOne(Inventory, { foreignKey: "productId", as: "productInventory" });
-Inventory.belongsTo(Product, { foreignKey: "productId" });
+// Product.hasOne(Inventory, { foreignKey: "productId", as: "productInventory" });
+// Inventory.belongsTo(Product, { foreignKey: "productId" });
 
 // Asociación entre Product e Purchase
 Product.hasMany(Purchase, { foreignKey: "productId", as: "productPurchases" });

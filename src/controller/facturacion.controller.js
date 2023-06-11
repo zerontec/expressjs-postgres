@@ -1,5 +1,6 @@
 const {
   DailySales,
+  inventory,
   Invoice,
   Customer,
   Seller,
@@ -11,7 +12,7 @@ const {
 } = require("../db");
 const { Op } = require("sequelize");
 const { generatePdf } = require("../until/pdfgenerator");
-const inventory = require("../models/inventory");
+
 async function generateInvoiceNumber() {
   // Obtener el número de factura más alto actualmente en la base de datos
   const highestInvoice = await InvoiceFactura.findOne({
@@ -233,7 +234,7 @@ const getAllInvoice = async (req, res, next) => {
   try {
     const invoices = await InvoiceFactura.findAll();
     if (invoices.length === 0) {
-      return res.status(404), json({ messague: "No Hay facturas quemostrar " });
+      return res.status(404), json({ message: "No Hay facturas quemostrar " });
     } else res.status(200).json(invoices);
   } catch (err) {
     res.status(500).json(err);

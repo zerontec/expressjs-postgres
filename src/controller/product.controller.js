@@ -109,7 +109,7 @@ const getProducts = async (req, res, next) => {
     const products = await Product.findAll();
     if(products.length === 0){
 
-        return res.status(404).json({messague:"No Hay Productos que mostrar"})
+        return res.status(404).json({message:"No Hay Productos que mostrar"})
     }
     res.status(200).json(products);
   } catch (error) {

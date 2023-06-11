@@ -9,7 +9,7 @@ router.post('/create', createInvoiceFactura);
 router.get('/all', getAllInvoice);
 router.get('/one/:id', getInvoiceDetails)
 router.post('/search-byDate', searchInvoicesByDate)
-router.get('/search-byQuery', searchInvoiceByQuery)
+router.get('/search-query', searchInvoiceByQuery)
 
 
 

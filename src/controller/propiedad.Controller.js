@@ -9,8 +9,7 @@ const createPropietir = async (req, res, next) => {
             type: req.body.type,
             address: req.body.address,
             price: req.body.price,
-            asesor: req.body.asesor,
-            image:req.body.image
+            asesor: req.body.asesor
         }
 
         await Propiedad.create(newProperti)
@@ -147,7 +146,7 @@ try{
     { type:type,address:address, price:price, asesor:asesor},
    
   );
-  return res.status(200).send("La propiedad ha sido Actualizada");
+  return res.status(200).send("the product was changed");
   }catch(err){
 
     console.log(err)

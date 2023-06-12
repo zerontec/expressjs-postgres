@@ -1,6 +1,6 @@
 const {Router} = require('express');
 
-const { createPurchase, findAllPurchase, updatePurchase, detailPurchase, deletepurchase } = require('../controller/purchase.controller');
+const {searchPurchaseByQueryI,searchPurchaseByQuery, createPurchase, findAllPurchase, updatePurchase, detailPurchase, deletepurchase } = require('../controller/purchase.controller');
 
 
 const router = Router();
@@ -10,8 +10,9 @@ router.get('/all-purchase', findAllPurchase);
 router.put('/update/:id', updatePurchase);
 router.get('/detail-purchase/:id', detailPurchase);
 router.delete('/delete-purchase/:id', deletepurchase)
+router.get('/search-query',searchPurchaseByQuery )
 
-
+router.get('/search-query-p',searchPurchaseByQueryI )
 
 
 

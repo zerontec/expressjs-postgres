@@ -3,18 +3,19 @@ const {Customer, AccountsReceivable, InvoiceFactura} = require('../db')
 
 const createAccountsReceivable = async (req, res, next) => {
     try {
-      const { saleId, customerId, amount, dueDate } = req.body;
+      const {clientData,status,notes,    amount, dueDate } = req.body;
   
-      const existingSale = await Sale.findByPk(saleId);
+      // const existingSale = await Sale.findByPk(saleId);
       const existingCustomer = await Customer.findByPk(customerId);
   
-      if (!existingSale || !existingCustomer) {
-        return res.status(404).json({ message: 'Venta o cliente no encontrado' });
+      if ( !existingCustomer) {
+        return res.status(404).json({ message: ' cliente no encontrado' });
       }
   
       const newAccountsReceivable = await AccountsReceivable.create({
-        saleId,
-        customerId,
+        clientData,
+        status,
+        notes,
         amount,
         dueDate,
         paid: false, // Inicialmente se establece como no pagado

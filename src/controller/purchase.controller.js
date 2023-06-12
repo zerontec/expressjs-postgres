@@ -1,6 +1,6 @@
 
 const {Invoice, AccountPayable, Purchase, Supplier, Product, Inventory} =require('../db');
-
+const {Op}=require('sequelize')
 
 
 const createPurchase = async (req, res, next) => {
@@ -284,11 +284,11 @@ res.status(201).json({messague:'Compra actualizada correctamente '})
 
 
 const searchPurchaseByQuery = async (req, res, next) => {
-  console.log("Buscando Invoices...");
+  console.log("Buscando purchase...");
   const { q } = req.query;
 
   try {
-    const invoices = await InvoiceFactura.findAll({
+    const purchase = await Purchase.findAll({
       where: {
         [Op.or]: [
           {
@@ -296,24 +296,54 @@ const searchPurchaseByQuery = async (req, res, next) => {
               [Op.iLike]: `%${q}%`,
             },
           },
-          {
-            clienteData: {
-              [Op.iLike]: `%${q}%`,
-            },
-          },
+        
         ],
       },
     });
-    console.log("Consulta SQL generada:", invoices.toString()); // Nueva línea de código
-    console.log("Aqui el log", invoices);
-    console.log("q:", invoices.toString()); // Verificar la consulta
-    if (analysis.length === 0) {
+    console.log("Consulta SQL generada:", purchase.toString()); // Nueva línea de código
+    console.log("Aqui el log", purchase);
+    console.log("q:", purchase.toString()); // Verificar la consulta
+    if (purchase.length === 0) {
       console.log("No se encontraron análisis.");
-      return res.status(404).json({ message: "No se Encontro Analysis" });
+      return res.status(404).json({ message: "No se Encontro purchase" });
     }
 
-    res.status(200).json(analysis);
-    console.log(analysis);
+    res.status(200).json(purchase);
+    console.log(purchase);
+  } catch (err) {
+    console.error("Error al ejecutar la consulta:", err);
+    res.status(500).json(err);
+    next(err);
+  }
+};
+
+const searchPurchaseByQueryI = async (req, res, next) => {
+  console.log("Buscando purchase...");
+  const { q } = req.query;
+
+  try {
+    const invoice= await Purchase.findAll({
+      where: {
+         
+          
+            purchaseNumber: {
+              [Op.eq]: q,
+            },
+          
+        
+        
+      },
+    });
+    console.log("Consulta SQL generada:", invoice.toString()); // Nueva línea de código
+    console.log("Aqui el log", invoice);
+    console.log("q:", invoice.toString()); // Verificar la consulta
+    if (invoice.length === 0) {
+      console.log("No se encontraron análisis.");
+      return res.status(404).json({ message: "No se Encontro Compra" });
+    }
+
+    res.status(200).json(invoice);
+    console.log(invoice);
   } catch (err) {
     console.error("Error al ejecutar la consulta:", err);
     res.status(500).json(err);
@@ -323,12 +353,15 @@ const searchPurchaseByQuery = async (req, res, next) => {
 
 
 
+
 module.exports={
 
 createPurchase,
 findAllPurchase,
 detailPurchase,
 updatePurchase,
-deletepurchase
+deletepurchase,
+searchPurchaseByQuery,
+searchPurchaseByQueryI
 
 }

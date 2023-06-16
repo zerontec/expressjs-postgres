@@ -192,7 +192,7 @@ const FindClientByCedula = async (req, res, next) => {
           .status(404)
           .json({ message: "no hay informacion que mostrar" });
       } else {
-        return res.status(200).json(customer);
+        return res.status(200).json({customer});
       }
     } catch (err) {
       res.status(500).json(err);

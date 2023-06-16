@@ -52,7 +52,7 @@ const findAll = async (req, res, next) => {
       return res.status(404).json({ messague: "No se encontro Vendedores" });
     }
 
-    res.status(201).json(seller);
+    res.status(201).json({seller});
   } catch (err) {
     res.status(500).json(err);
   }

@@ -1,6 +1,6 @@
 const {Router} = require('express');
 const router = Router();
-const {getUser, createUser, getAllUser, putUser, deleteUser, searchUser} = require('../controller/user.controller');
+const {serachUserByQuery,getUser, createUser, getAllUser, putUser, deleteUser, searchUser, deleteMultipleUsers} = require('../controller/user.controller');
 const authJwt = require('../middleware/authJwt');
 
 
@@ -9,8 +9,8 @@ router.get( '/get-all',authJwt.verifyToken, authJwt.isAdmin, getAllUser);
 router.get('/get/:id',authJwt.verifyToken, authJwt.isAdmin, getUser);
 router.put('/update/:id',authJwt.verifyToken, authJwt.isAdmin, putUser);
 router.delete('/delete/:id',authJwt.verifyToken, authJwt.isAdmin, deleteUser);
-router.get('/', searchUser);
-
+router.get('/search-query', serachUserByQuery);
+router.delete('/delete-multiply',authJwt.verifyToken, authJwt.isAdmin, deleteMultipleUsers)
 
 
  

@@ -12,12 +12,12 @@ const defaultAdminAndRoles = async () => {
 
       const rolUserTl = await Role.create({
         id: 2,
-        name: "usertl",
+        name: "vendedor",
       });
 
       const rolUserGl = await Role.create({
         id: 3,
-        name: "usergl",
+        name: "facturacion",
       });
     } else {
       res.status(200).send({ message: "Roles exist" });

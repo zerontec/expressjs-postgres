@@ -1,5 +1,6 @@
-const { User } = require("../db");
+const { User ,Role} = require("../db");
 const bcrypt = require("bcryptjs");
+const {Op} = require('sequelize')
 
 /**
  * It creates a new user with a hashed password.
@@ -9,24 +10,111 @@ const bcrypt = require("bcryptjs");
  */
 
 const createUser = async (req, res, next) => {
-  try {
+  
+    const { email, username, isSeller  } = req.body;
+    
+    let existingEmail = await User.findOne({
+      where: {
+        email: email
+      }
+    });
+
+    if (existingEmail) {
+      return res.status(409).json({ message: 'Ya existe el email en el sistema' });
+    }
+  
+    let existingUsername = await User.findOne({
+      where: {
+        username: username
+      }
+    });
+
+    if (existingUsername !== null) {
+      return res.status(409).json({ message: 'Ya existe el usuario en el sistema' });
+    }
+
+
+    
+  
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
-
+  
     const newUser = await User.create({
       username: req.body.username,
       email: req.body.email,
       name: req.body.name,
-      //   role:req.body.role,
+     
       password: hash,
-    });
+    })
 
-    res.status(201).send(newUser);
-  } catch (err) {
-    res.status(500).send(err);
-    console.log(err);
-  }
+    .then((user) => {
+      if (req.body.roles) {
+        Role.findAll({
+          where: {
+            name: {
+              [Op.or]: req.body.roles,
+            },
+          },
+        }).then((roles) => {
+          user.setRoles(roles).then(() => {
+            res.send({ message: "Usuario registrado satisfactoriamente" });
+          });
+        });
+      } else {
+        // user role = 1
+        user.setRoles([2]).then(() => {
+          res.send({ message: "Usuario registrado satisfactoriamente" });
+        });
+      }
+    })
+
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
+    });
+  
+   
+ 
 };
+
+// const createUser = async (req, res, next) => {
+  
+//     const salt = bcrypt.genSaltSync(10);
+//     const hash = bcrypt.hashSync(req.body.password, salt);
+
+//     const newUser = await User.create({
+//       username: req.body.username,
+//       email: req.body.email,
+//       name: req.body.name,
+//       role:req.body.role,
+//       password: hash,
+//     })
+
+//     .then((user) => {
+//       if (req.body.roles) {
+//         Role.findAll({
+//           where: {
+//             name: {
+//               [Op.or]: req.body.roles,
+//             },
+//           },
+//         }).then((roles) => {
+//           user.setRoles(roles).then(() => {
+//             res.send({ message: "Usuario registrado satisfactoriamente" });
+//           });
+//         });
+//       } else {
+//         // user role = 1
+//         user.setRoles([2]).then(() => {
+//           res.send({ message: "Usuario registrado satisfactoriamente" });
+//         });
+//       }
+//     })
+//     .catch((err) => {
+//       res.status(500).send({ message: err.message });
+//     });
+  
+  
+// };
 
 /**
  * It's a function that gets all the users from the database and sends them to the client.
@@ -93,13 +181,30 @@ const putUser = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id);
     if (user) {
-      user.update(req.body);
-      res.status(201).send({ user, message: "User update" });
-    } else res.status(400).send({ message: "User no Found" });
+      // Actualizar los datos del usuario
+      await user.update(req.body);
+
+      if (req.body.roles) {
+        // Si se proporciona el campo "roles" en req.body, actualizar también los roles del usuario
+        const roles = await Role.findAll({
+          where: {
+            name: {
+              [Op.or]: req.body.roles,
+            },
+          },
+        });
+        await user.setRoles(roles);
+      }
+
+      res.status(201).send({ user, message: "Usuario actualizado exitosamente" });
+    } else {
+      res.status(400).send({ message: "Usuario no encontrado" });
+    }
   } catch (err) {
     res.status(500).send(err);
   }
 };
+
 
 /**
  * It finds a user by id, and if it finds one, it deletes it.
@@ -147,6 +252,78 @@ const searchUser = async (req, res, next) => {
   }
 };
 
+
+const serachUserByQuery= async (req, res, next) => {
+  console.log("Buscando usuarios...");
+  const { q } = req.query;
+
+  try {
+    const users = await User.findAll({
+      where: {
+        [Op.or]: [
+          {
+            name: {
+              [Op.iLike]: `%${q}%`,
+            },
+          },
+          {
+            email: {
+              [Op.iLike]: `%${q}%`,
+            },
+          },
+        ],
+      },
+    });
+    console.log("Consulta SQL generada:", users.toString()); // Nueva línea de código
+    console.log("Aqui el log", users);
+    console.log("q:", users.toString()); // Verificar la consulta
+    if (users.length === 0) {
+      console.log("No se encontraron usersos.");
+      return res.status(404).json({ message: "No se Encontro Usuario" });
+    }
+    res.status(200).json(users);
+  console.log(users);
+
+  }catch(err){
+
+    res.status(500).json(err)
+    next(err)
+  }
+}
+
+const deleteMultipleUsers = async (req, res, next) => {
+  try {
+    const { ids } = req.body;
+
+    // Verificar que se proporcionaron los IDs de los productos
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({ message: "IDs de usuarios no proporcionados correctamente" });
+    }
+
+    // Buscar los productos por sus IDs
+    const users = await User.findAll({ where: { id: ids } });
+
+    // Verificar si todos los productos existen
+    if (users.length !== ids.length) {
+      return res.status(404).json({ message: "No se encontraron todos los usuarios" });
+    }
+
+    // Obtener los IDs de los productos encontrados
+    const foundUserIds = users.map((user) => user.id);
+
+  
+    // Eliminar los Useros
+    await User.destroy({ where: { id: foundUserIds } });
+
+    res.status(200).json({ message: "usuarios  eliminados correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Ocurrió un error al eliminar los usuarios" });
+  }
+};
+
+
+
 module.exports = {
   getAllUser,
   createUser,
@@ -154,4 +331,6 @@ module.exports = {
   putUser,
   deleteUser,
   searchUser,
+  serachUserByQuery,
+  deleteMultipleUsers
 };

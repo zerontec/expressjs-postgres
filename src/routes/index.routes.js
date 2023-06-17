@@ -16,6 +16,7 @@ const notaRoutes = require('./notaCredito.routes');
 const pdfRoutes = require('./pdf.routes');
 const accountpayableRoutes = require('./accountP.routes');
 const accountreceivableRoutes = require('./accountR.routes');
+const dollarRoutes = require('./dollar.routes')
 const URL = "/api/"
 
 router.use(`${URL}user`, userRoutes);
@@ -34,6 +35,7 @@ router.use(`${URL}creditnotes`, notaRoutes);
 router.use(`${URL}pdf`, pdfRoutes);
 router.use(`${URL}account-payable`, accountpayableRoutes);
 router.use(`${URL}account-receivable`, accountreceivableRoutes);
+router.use(`${URL}consulta`, dollarRoutes);
 
 
 module.exports = router;

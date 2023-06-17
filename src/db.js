@@ -3,7 +3,8 @@ const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
 const {
-  PGDATABASE, PGHOST, PGPASSWORD, PGPORT, PGUSER
+
+  PGDATABASE, PGHOST, PGPASSWORD, PGPORT, PGUSER, DB_USER, DB_PASSWORD, DB_HOST, DB_NAME 
 } = process.env;
 
 // const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/gallery`, {
@@ -24,6 +25,43 @@ const pool = new Pool({
 // Connect to the database using the DATABASE_URL environment
 //   variable injected by Railway
 
+
+
+// let sequelize =
+//   process.env.NODE_ENV === "development"
+//     ? new Sequelize({
+//         database: DB_NAME,
+//         dialect: "postgres",
+//         host: DB_HOST,
+//         port: 5432,
+//         username: DB_USER,
+//         password: DB_PASSWORD,
+//         pool: {
+//           max: 3,
+//           min: 1,
+//           idle: 10000,
+//         },
+
+//         pool: {
+//           max: 5, // Número máximo de conexiones en el pool
+//           min: 0, // Número mínimo de conexiones en el pool
+//           acquire: 30000, // Tiempo máximo en milisegundos para adquirir una conexión
+//           idle: 10000, // Tiempo máximo en milisegundos que una conexión puede estar inactiva antes de ser liberada
+//         },
+//         dialectOptions: {
+//           ssl: {
+//             require: true,
+//             // Ref.: https://github.com/brianc/node-postgres/issues/2009
+//             rejectUnauthorized: false,
+//           },
+//           keepAlive: true,
+//         },
+//         ssl: true,
+//       })
+//     : new Sequelize(
+//         `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/munecadb`,
+//         { logging: false, native: false }
+//       );
 
 
 
@@ -110,7 +148,7 @@ const {
   PurcharseOrder,
   buyServices,
 } = sequelize.models;
-const ROLES = ["admin", "usergl", "usertl"];
+const ROLES = ["admin", "vendedor", "facturacion"];
 
 Role.belongsToMany(User, {
   through: "user_roles",

@@ -189,13 +189,13 @@ const findAllPurchase = async(req, res, next) => {
 
   try{
 
-const purchase = await Purchase.findAll();
-if(purchase.length === 0){
+const purchases = await Purchase.findAll();
+if(purchases.length === 0){
 
   return res.status(400).json({messague:"No se encontraron compras registradas"});
 
 
-} else res.status(201).json(purchase)
+} else res.status(201).json(purchases)
 
 
 

@@ -94,8 +94,11 @@ const createAccountsPayable = async (req, res, next) => {
       const accountsPayable = await AccountPayable.findAll({
         include: [Purchase, Supplier],
       });
-  
-      res.status(200).json(accountsPayable);
+  if(accountsPayable.length === 0){
+
+    return res.status(400).json({message:'No hay informacion que mostrar '})
+  }
+      res.status(200).json({accountsPayable});
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Ocurrió un error al obtener las cuentas por pagar' });

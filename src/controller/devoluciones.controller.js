@@ -130,18 +130,21 @@ const crearDevolucion = async (req, res, next) => {
         });
 
         productosDevueltos.push(productoDevuelto);
-        productoDevueltosA.push(
-          productoEnFactura.barcode,
-          productoEnFactura.name
-        );
+        // productoDevueltosA.push(
+        //   productoEnFactura.barcode,
+        //   productoEnFactura.name
+        
+        // );
       }
     }
 
-    // Sumar las cantidades devueltas al inventario de Store
+    console.log("productos devuel", productosDevueltos)
+
+    // Sumar las cantidades devueltas al inventario de Product
     for (const productoDevuelto of productosDevueltos) {
       const { barcode, cantidadDevuelta } = productoDevuelto;
 
-      const inventory = await Store.findOne({
+      const inventory = await Product.findOne({
         where: { barcode: barcode },
       });
 

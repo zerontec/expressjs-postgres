@@ -130,11 +130,11 @@ const crearDevolucion = async (req, res, next) => {
         });
 
         productosDevueltos.push(productoDevuelto);
-        // productoDevueltosA.push(
-        //   productoEnFactura.barcode,
-        //   productoEnFactura.name
+        productoDevueltosA.push(
+          productoEnFactura.barcode,
+          productoEnFactura.name
         
-        // );
+        );
       }
     }
 

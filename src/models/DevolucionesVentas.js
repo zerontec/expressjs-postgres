@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
             allowNull: false,
           },
           productoD: {
-            type: DataTypes.JSONB,
+            type: DataTypes.ARRAY(DataTypes.JSONB),
             allowNull: true,
           },
 

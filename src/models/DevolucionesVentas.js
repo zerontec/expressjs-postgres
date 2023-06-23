@@ -26,7 +26,7 @@ module.exports = (sequelize) => {
             allowNull: true,
           },
 
-          total: {
+     total: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
           },

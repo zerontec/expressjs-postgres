@@ -37,7 +37,7 @@ async function generateInvoiceNumber() {
 
 const createInvoiceFactura = async (req, res, next) => {
   try {
-    const { cantidad, customer, seller, productos, credit, dueDate, paymentMethod } = req.body;
+    const { quantity, customer, seller, productos, credit, dueDate, paymentMethod } = req.body;
 
     // Verificar si el vendedor existe
     const vendedor = await Seller.findOne({
@@ -76,14 +76,14 @@ const createInvoiceFactura = async (req, res, next) => {
     // Verificar y descargar los productos de la tienda
     const productFactura = [];
 for (const producto of productos) {
-  const { barcode, cantidad} = producto;
+  const { barcode, quantity} = producto;
 
   // Verificar si el producto existe en el inventario
   const inventory = await Product.findOne({
     where: { barcode },
   });
 
-  if (!inventory || inventory.quantity < cantidad) {
+  if (!inventory || inventory.quantity < quantity) {
     return res
       .status(400)
       .json({ message: "Cantidad insuficiente de producto en la tienda" });
@@ -92,29 +92,44 @@ for (const producto of productos) {
   const { price } = inventory;
 
   // Actualizar la cantidad disponible del producto en la tienda
-  inventory.quantity -= cantidad;
+  inventory.quantity -= quantity;
   await inventory.save();
 
-  const subtotalProducto = producto.price * producto.cantidad; // Calcular el subtotal del producto por cantidad
+  const subtotalProducto = producto.price * producto.quantity // Calcular el subtotal del producto por cantidad
   console.log("aqui subTotalProduct", subtotalProducto)
   subtotal += subtotalProducto;
 
- 
+  const sinIva = subtotalProducto/1.16
+ const ivaR = sinIva - subtotal
   productFactura.push({
     name: producto.name,
-    cantidad: producto.cantidad,
+    quantity: producto.quantity,
     price: producto.price,
     barcode: producto.barcode,
     id: producto.id,
-    subtotal: subtotalProducto, 
+    subtotal: sinIva, 
+    iva:ivaR
     
   });
 }
-const ivaRate = 0.16;
-const iva = subtotal * ivaRate; // Calcular el IVA
-console.log("aqui iva",iva)
+// const ivaRate = 1.16;
+// const iva = subtotal / ivaRate; // Calcular el IVA
 
-    const totalPrice = subtotal + iva;
+// console.log("aqui iva",iva)
+const subtotalB = subtotal / 1.16
+console.log("subtotalB",subtotalB)
+const resultSubB = subtotalB
+
+console.log("resultSubB ",resultSubB )
+const iva = subtotal - resultSubB
+console.log("Iva ",iva)
+const TotalF = resultSubB + iva
+
+console.log("TotalF ",TotalF )
+
+
+
+    const totalPrice = TotalF
     let amount = totalPrice;
     let resEstatus ="";
     if(credit){
@@ -135,9 +150,9 @@ console.log("aqui iva",iva)
       paymentMethod,
       notes: "",
       amount:totalPrice,
-      subtotal,
-      iva,
-      cantidad,
+      subtotal:subtotalB,
+      iva:iva,
+      quantity,
       clienteData: {
         name: cliente.name,
         identification: cliente.identification,
@@ -196,8 +211,8 @@ console.log("aqui iva",iva)
       status: "Pendiente",
       paymentMethod: "Contado",
       notes: "",
-      subtotal,
-      iva,
+      subtotal:subtotalB,
+      iva:iva,
       amount,
       cliente: {
         name: cliente.name,
@@ -212,9 +227,10 @@ console.log("aqui iva",iva)
       productos: productos.map((item) => ({
         barcode: item.barcode,
         name: item.name,
-        cantidad: item.cantidad,
+        quantity: item.quantity,
         price: item.price,
         id: item.id,
+        iva
       })),
     };
 

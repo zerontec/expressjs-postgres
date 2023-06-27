@@ -22,15 +22,23 @@ module.exports = (sequelize) => {
             allowNull: false,
           },
           productoD: {
-            type: DataTypes.JSONB,
+            type: DataTypes.ARRAY(DataTypes.JSONB),
             allowNull: true,
           },
 
-     total: {
+          total: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
           },
 
+          customerData:{
+
+
+            type:DataTypes.JSONB
+          },
+
+
+          
      
         });
 };

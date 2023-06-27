@@ -89,7 +89,7 @@ const newProducts = [];
         existingProduct.price = price;
         await existingProduct.save();
       } else {
-       // Crear el producto en la tabla de inventario y asociarlo a la compra
+       // Crear el producto en la tabla de producto y asociarlo a la compra
     const createdProduct = await Product.create({
       purchaseId: newPurchase.id,
       quantity:cantidad,

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-    sequelize.define('productoDevuelto', {
+    sequelize.define('productosDefectuosos', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -14,24 +14,18 @@ module.exports = (sequelize) => {
           cantidadDevuelta: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: 0,
-          },
-          invoiceNumber:{
-
-               type:DataTypes.STRING 
           },
           name: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
+          },
           fechaDevolucion: {
             type: DataTypes.DATE,
             allowNull: false,
           },
-          productid:{
+          invoiceNumber:{
 
-            type:DataTypes.INTEGER
-          }
-        
+            type:DataTypes.STRING 
+       },
         });
 };

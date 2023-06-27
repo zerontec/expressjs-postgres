@@ -1,13 +1,13 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define('notaCredito', {
+  sequelize.define('notaDebito', {
     numeroNota: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         unique: true,
       },
-      fecha: {
+      fechaEmision: {
         type: DataTypes.DATE,
         allowNull: false,
       },
@@ -15,13 +15,12 @@ module.exports = (sequelize) => {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
+      motivo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       clienteData: {
         type: DataTypes.JSONB,
-        allowNull: true,
-      },
-
-      productosDevueltos: {
-        type: DataTypes.TEXT, // Puedes ajustar el tipo de columna según tus necesidades
         allowNull: true,
       },
   });

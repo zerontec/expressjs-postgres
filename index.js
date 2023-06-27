@@ -23,7 +23,7 @@ const server = require('./src/app.js');
 const { conn } = require('./src/db.js');
 
 
-// const {  defaultAdminAndRoles } = require('../api/src/dbLoad/loadUser');
+// const {  defaultAdminAndRoles } = require('./src/dbLoad/loadUser.js');
 
 const port = process.env.PORT || 5040;
 

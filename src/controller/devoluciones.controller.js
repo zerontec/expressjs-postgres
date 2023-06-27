@@ -3,7 +3,10 @@ const {
   InvoiceFactura,
   Product,
   ProductoDevuelto,
-  Store,
+  Customer,
+  NotaCredito,
+  ProductosDefectuosos
+ 
 } = require("../db");
 const { Sequelize } = require("sequelize");
 const { crearNotaCredito } = require("./notaCredito.controller");
@@ -32,10 +35,30 @@ const generarDevolucionNumber = async () => {
 
   return nextDevolucionNumber;
 };
+const generarNumeroNota = async () => {
+  // Obtener el número de devolución más alto actualmente en la base de datos
+  const highestNota = await NotaCredito.findOne({
+    attributes: [
+      [Sequelize.fn("max", Sequelize.col("numeroNota")), "maxNota"],
+    ],
+  });
+
+  // Obtener el número de devolución más alto o establecerlo en 0 si no hay Noataes existentes
+  const highestNotaNumber = highestNota
+    ? highestNota.get("maxNota")
+    : 0;
+
+  // Incrementar el número de devolución en 1
+  const nextNotaNumber = highestNotaNumber + 1;
+
+  return nextNotaNumber;
+};
+
+
 
 const crearDevolucion = async (req, res, next) => {
   try {
-    const { invoiceNumber, motivo, productos } = req.body;
+    const { invoiceNumber, motivo, productos, fechaDevolucion ,id} = req.body;
 
     // Verificar si la factura existe
     const factura = await InvoiceFactura.findByPk(invoiceNumber, {
@@ -62,27 +85,26 @@ const crearDevolucion = async (req, res, next) => {
     let totalDevolucion = 0;
 
     for (const producto of productos) {
-      const { barcode, cantidad } = producto;
+      const { id, quantity, defectuoso, barcode } = producto;
 
       // Verificar si el producto existe en la factura
-      // Verificar si el producto existe en la factura
-      let productoDevuelto = null;
+      let productoFactura = null;
 
-      for (const producto of factura.productoFactura) {
-        if (producto.barcode === barcode) {
-          productoDevuelto = producto;
+      for (const productoFacturaItem of factura.productoFactura) {
+        if (productoFacturaItem.barcode === barcode) {
+          productoFactura = productoFacturaItem;
           break;
         }
       }
 
-      if (!productoDevuelto) {
+      if (!productoFactura) {
         return res
           .status(400)
           .json({ message: "El producto no existe en la factura" });
       }
 
       // Verificar que la cantidad devuelta no supere la cantidad vendida
-      if (cantidad > productoDevuelto.quantity) {
+      if (quantity > productoFactura.quantity) {
         return res
           .status(400)
           .json({
@@ -91,91 +113,83 @@ const crearDevolucion = async (req, res, next) => {
       }
 
       // Actualizar la cantidad devuelta del producto
-      productoDevuelto.cantidadDevuelta += cantidad;
+      productoFactura.cantidadDevuelta += quantity;
 
       // Calcular el monto total de la devolución para el producto
-      const montoDevuelto = cantidad * productoDevuelto.price;
-
-      console.log("aqui montoDevuelto", montoDevuelto);
+      const montoDevuelto = quantity * productoFactura.price;
 
       totalDevolucion += montoDevuelto;
 
-      // Actualizar el monto total de la factura
-      factura.montoTotal -= montoDevuelto;
+      // Obtener el nombre del producto
+      const productoItem = await Product.findByPk(id);
+      const nombreProducto = productoItem ? productoItem.name : null;
 
+      console.log("nombreProduc", nombreProducto)
       // Guardar los cambios en el producto devuelto
       await ProductoDevuelto.create({
+        name: nombreProducto || "",
+        productId: id,
+        cantidadDevuelta: quantity,
+        fechaDevolucion: new Date(),
+        invoiceNumber,
         barcode,
-        cantidadDevuelta: cantidad,
       });
-    }
-    const productosDevueltos = [];
-    const productoDevueltosA = [];
 
-    for (const producto of productos) {
-      const { barcode, cantidad } = producto;
-
-      // Buscar el producto en la factura
-      const productoEnFactura = factura.productoFactura.find(
-        (prod) => prod.barcode === barcode
-      );
-
-      if (productoEnFactura) {
-        const productoDevuelto = await ProductoDevuelto.create({
-          // Guardar los campos correspondientes al producto devuelto
-          // Puedes ajustar esto según tu modelo ProductoDevuelto
-          barcode: productoEnFactura.barcode,
-          cantidadDevuelta: cantidad,
-          // Otros campos necesarios
+      // Si el producto es defectuoso, agregarlo a la tabla ProductosDefectuosos
+   /* This code block is checking if the reason for the return is "defective" and if so, it creates a
+   new entry in the "ProductosDefectuosos" table with the barcode, quantity returned, return date,
+   invoice number, and product name. This is used to keep track of defective products and their
+   returns separately from other returns. */
+      if (motivo === "defectuoso") {
+        await ProductosDefectuosos.create({
+          barcode,
+          cantidadDevuelta: quantity,
+          fechaDevolucion: new Date(),
+          invoiceNumber,
+          name: nombreProducto || "",
         });
-
-        productosDevueltos.push(productoDevuelto);
-        productoDevueltosA.push(
-          productoEnFactura.barcode,
-          productoEnFactura.name
-        
-        );
       }
     }
 
-    console.log("productos devuel", productosDevueltos)
-
     // Sumar las cantidades devueltas al inventario de Product
-    for (const productoDevuelto of productosDevueltos) {
-      const { barcode, cantidadDevuelta } = productoDevuelto;
+    for (const producto of productos) {
+      const { id, quantity} = producto;
 
-      const inventory = await Product.findOne({
-        where: { barcode: barcode },
-      });
+      const inventory = await Product.findByPk(id);
 
       if (inventory) {
-        inventory.quantity += cantidadDevuelta;
+        inventory.quantity += quantity;
         await inventory.save();
       }
     }
 
     // Crear la devolución
     const numeroDevolucion = await generarDevolucionNumber();
-
     const montoDev = totalDevolucion + 0.16;
+
     const devolucion = await DevolucionesVentas.create({
       numeroDevolucion,
       fechaDevolucion: new Date(),
       motivo,
       invoiceNumber,
       total: montoDev,
-      productoD: productoDevueltosA,
+      customerData: factura.clienteData,
+      clienteId: factura.clienteId,
+      productoD: productos, // Aquí asignamos los productos a la columna productoD
     });
-
     // Guardar los cambios en la factura
     await factura.save();
 
-    const dataclient = factura.clienteData;
-
-    console.log("aqui montoDev", montoDev);
-    console.log("aqui totalDevolucion", totalDevolucion);
-
-    await crearNotaCredito(numeroDevolucion, new Date(), montoDev, dataclient);
+    const numeroNota = await generarNumeroNota();
+    // Crear la nota de crédito
+    const notaCredito = await NotaCredito.create({
+      numeroNota,
+      fecha: new Date(),
+      montoDev: montoDev || 0,
+      clienteData: factura.clienteData,
+      productosDevueltos: JSON.stringify(productos),
+      monto: totalDevolucion,
+    });
 
     // Actualizar el estado de la devolución
     devolucion.estado = "Completa";
@@ -189,6 +203,9 @@ const crearDevolucion = async (req, res, next) => {
       .json({ message: "Ocurrió un error al crear la devolución" });
   }
 };
+
+
+
 
 const obtenerDevolucionesVentas = async (req, res, next) => {
   try {

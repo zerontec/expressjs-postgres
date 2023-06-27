@@ -27,57 +27,26 @@ const pool = new Pool({
 
 
 
-let sequelize =
-  process.env.NODE_ENV === "development"
-    ? new Sequelize({
-        database: DB_NAME,
-        dialect: "postgres",
-        host: DB_HOST,
-        port: 5432,
-        username: DB_USER,
-        password: DB_PASSWORD,
-        pool: {
-          max: 3,
-          min: 1,
-          idle: 10000,
-        },
-
-        pool: {
-          max: 5, // Número máximo de conexiones en el pool
-          min: 0, // Número mínimo de conexiones en el pool
-          acquire: 30000, // Tiempo máximo en milisegundos para adquirir una conexión
-          idle: 10000, // Tiempo máximo en milisegundos que una conexión puede estar inactiva antes de ser liberada
-        },
-        dialectOptions: {
-          ssl: {
-            require: true,
-            // Ref.: https://github.com/brianc/node-postgres/issues/2009
-            rejectUnauthorized: false,
-          },
-          keepAlive: true,
-        },
-        ssl: true,
-      })
-    : new Sequelize(
-        `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/munecadb`,
-        { logging: false, native: false }
-      );
-
-
-
 // let sequelize =
-//   process.env.NODE_ENV === "production"
+//   process.env.NODE_ENV === "development"
 //     ? new Sequelize({
-//         database: PGDATABASE,
+//         database: DB_NAME,
 //         dialect: "postgres",
-//         host: PGHOST, 
-//         port: PGPORT,
-//         username: PGUSER,
-//         password: PGPASSWORD,
+//         host: DB_HOST,
+//         port: 5432,
+//         username: DB_USER,
+//         password: DB_PASSWORD,
 //         pool: {
 //           max: 3,
 //           min: 1,
 //           idle: 10000,
+//         },
+
+//         pool: {
+//           max: 5, // Número máximo de conexiones en el pool
+//           min: 0, // Número mínimo de conexiones en el pool
+//           acquire: 30000, // Tiempo máximo en milisegundos para adquirir una conexión
+//           idle: 10000, // Tiempo máximo en milisegundos que una conexión puede estar inactiva antes de ser liberada
 //         },
 //         dialectOptions: {
 //           ssl: {
@@ -90,9 +59,40 @@ let sequelize =
 //         ssl: true,
 //       })
 //     : new Sequelize(
-//         `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`,
+//         `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/munecadb`,
 //         { logging: false, native: false }
 //       );
+
+
+
+let sequelize =
+  process.env.NODE_ENV === "production"
+    ? new Sequelize({
+        database: PGDATABASE,
+        dialect: "postgres",
+        host: PGHOST, 
+        port: PGPORT,
+        username: PGUSER,
+        password: PGPASSWORD,
+        pool: {
+          max: 3,
+          min: 1,
+          idle: 10000,
+        },
+        dialectOptions: {
+          ssl: {
+            require: true,
+            // Ref.: https://github.com/brianc/node-postgres/issues/2009
+            rejectUnauthorized: false,
+          },
+          keepAlive: true,
+        },
+        ssl: true,
+      })
+    : new Sequelize(
+        `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`,
+        { logging: false, native: false }
+      );
 
 
 const basename = path.basename(__filename);

@@ -37,7 +37,14 @@ module.exports = (sequelize) => {
             type: DataTypes.FLOAT,
             
           },
+          defectuosos:{
+
+          type:DataTypes.INTEGER
+
+          }
 
      
         });
+
+        
 };

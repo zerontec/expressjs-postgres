@@ -1,5 +1,5 @@
 const {Router} = require('express');
-const {getAllQuantityProduct, getAllQuantity,serachProductByQuery,updateProduct,moveProductToStoreA,createProduct, updateProductQuantity, getProducts, deleteProductP, deleteMultipleProducts } = require('../controller/product.controller');
+const {getAllQuantityProduct, getAllQuantity,serachProductByQuery,updateProduct,moveProductToStoreA,createProduct, updateProductQuantity, getProducts, deleteProductP, deleteMultipleProducts, getProductStat } = require('../controller/product.controller');
 
 const router = Router();
 
@@ -15,6 +15,7 @@ router.post('/move-to-store', moveProductToStoreA)
 router.get('/search-query', serachProductByQuery)
 router.get('/all-quantiy', getAllQuantity);
 router.get('/all-quantity-product', getAllQuantityProduct)
+router.get('/all-product-stat', getProductStat)
 
 
 

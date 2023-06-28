@@ -11,6 +11,11 @@ module.exports = (sequelize) => {
             type: DataTypes.DATE,
             allowNull: false,
           },
+
+          fechaVentaF: {
+            type: DataTypes.DATE,
+            
+          },
           motivo: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -22,7 +27,7 @@ module.exports = (sequelize) => {
             allowNull: false,
           },
           productoD: {
-            type:DataTypes.JSONB,
+            type: DataTypes.ARRAY(DataTypes.JSONB),
             allowNull: true,
           },
 
@@ -42,3 +47,4 @@ module.exports = (sequelize) => {
      
         });
 };
+

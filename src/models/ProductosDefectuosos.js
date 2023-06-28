@@ -27,5 +27,11 @@ module.exports = (sequelize) => {
 
             type:DataTypes.STRING 
        },
+
+
+       motivo:{
+
+        type:DataTypes.STRING
+       }
         });
 };

@@ -1,6 +1,6 @@
-const { Product, Inventory, Store } = require("../db");
+const {DevolucionesVentas,Purchase,Supplier,Customer, Product, Inventory, Store,InvoiceFactura, ProductosDefectuosos } = require("../db");
 
-const {Op} = require('sequelize')
+const {Op} = require('sequelize');
 
 // Controlador para crear un nuevo producto en el inventario
 // Controlador para crear un nuevo producto
@@ -107,18 +107,122 @@ const updateProductQuantity = async (req, res, next) => {
 const getProducts = async (req, res, next) => {
   try {
     const products = await Product.findAll();
-    if(products.length === 0){
 
-        return res.status(404).json({message:"No Hay Productos que mostrar"})
+    if (products.length === 0) {
+      return res.status(404).json({ message: "No hay productos que mostrar" });
     }
-    res.status(200).json(products);
+
+    const productsWithDefectuosos = await Promise.all(
+      products.map(async (product) => {
+        const defectuosos = await ProductosDefectuosos.sum('cantidadDevuelta', {
+          where: { barcode: product.barcode},
+        });
+
+        // Actualizar la columna "defectuosos" en la tabla de productos
+        await product.update({ defectuosos: defectuosos || 0 });
+
+        return product.toJSON();
+      })
+    );
+
+    res.status(200).json(productsWithDefectuosos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Ocurrió un error al obtener los productos" });
+  }
+};
+
+
+
+const getProductStat = async (req, res, next) => {
+  try {
+    const products = await Product.findAll({
+      include: [
+        {
+          model: Purchase,
+          as: 'productPurchases',
+          attributes: ['id', 'createdAt'],
+          include: [
+            {
+              model: Supplier,
+              as: 'supplier',
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
+        {
+          
+            model: InvoiceFactura,
+            as: 'products',
+          attributes: ['id', 'createdAt'],
+          include: [
+            {
+              model: Customer,
+              as: 'customer',
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
+        // {
+        //   model: DevolucionCompras,
+        //   as: 'devolucionCompra',
+        //   attributes: ['id', 'createdAt'],
+        // },
+        {
+          model: DevolucionesVentas,
+          as: 'productosDevueltos',
+          attributes: ['id', 'createdAt'],
+        },
+      ],
+      order: [
+        ['productPurchases', 'createdAt', 'DESC'],
+        ['products', 'createdAt', 'DESC'],
+        ['devolucionCompra', 'createdAt', 'DESC'],
+        ['productosDevueltos', 'createdAt', 'DESC'],
+      ],
+    });
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: 'No hay productos que mostrar' });
+    }
+
+    const formattedProducts = products.map((product) => {
+      const purchases = product.purchases.map((purchase) => ({
+        id: purchase.id,
+        date: purchase.createdAt,
+        supplier: purchase.supplier ? purchase.supplier.name : null,
+      }));
+
+      const sales = product.sales.map((sale) => ({
+        id: sale.id,
+        date: sale.createdAt,
+        customer: sale.customer ? sale.customer.name : null,
+      }));
+
+      return {
+        id: product.id,
+        name: product.name,
+        quantity: product.quantity,
+        price: product.price,
+        barcode: product.barcode,
+        description: product.description,
+        purchases,
+        sales,
+      };
+    });
+
+    res.status(200).json(formattedProducts);
   } catch (error) {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Ocurrió un error al obtener los productos" });
-  }
+      .json({ message: 'Ocurrió un error al obtener los productos' });
+  
+  next(error)
+    }
 };
+
+
 
 
 const getAllQuantity =async (req, res, next) => {
@@ -403,6 +507,45 @@ const deleteProductP = async (req, res, next) => {
   }
  
 
+  const incrementProductQuantity = async (req, res, next) => {
+    try {
+      const { codigo, cantidad, numeroFactura, proveedor, fechaUltimaCompra } = req.body;
+  
+      // Verificar si el producto ya existe en la base de datos
+      const existingProduct = await Product.findOne({
+        where: { codigo },
+      });
+  
+      if (existingProduct) {
+        // Incrementar la cantidad y actualizar la información adicional
+        existingProduct.cantidad += cantidad;
+        existingProduct.numeroFactura = numeroFactura;
+        existingProduct.proveedor = proveedor;
+        existingProduct.fechaUltimaCompra = fechaUltimaCompra;
+  
+        // Guardar los cambios en la base de datos
+        await existingProduct.save();
+  
+        res.status(200).json({ message: 'Cantidad actualizada correctamente' });
+      } else {
+        // Crear un nuevo producto con la cantidad y la información adicional
+        const newProduct = await Product.create({
+          codigo,
+          cantidad,
+          numeroFactura,
+          proveedor,
+          fechaUltimaCompra,
+        });
+  
+        res.status(201).json({ message: 'Producto creado correctamente' });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Ocurrió un error al incrementar la cantidad del producto' });
+    }
+  };
+  
+
 
 module.exports = {
   createProduct,
@@ -414,5 +557,6 @@ module.exports = {
   serachProductByQuery,
   updateProduct,
   getAllQuantity,
-  getAllQuantityProduct
+  getAllQuantityProduct,
+  getProductStat
 };

@@ -72,14 +72,14 @@ const crearDevolucion = async (req, res, next) => {
     }
 
     // Verificar si la factura ya tiene una devolución asociada
-    const devolucionExistente = await DevolucionesVentas.findOne({
-      where: { invoiceNumber },
-    });
-    if (devolucionExistente) {
-      return res
-        .status(400)
-        .json({ message: "Ya se ha creado una devolución para esta factura" });
-    }
+    // const devolucionExistente = await DevolucionesVentas.findOne({
+    //   where: { invoiceNumber },
+    // });
+    // if (devolucionExistente) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Ya se ha creado una devolución para esta factura" });
+    // }
 
     // Actualizar los montos totales de la factura y los productos devueltos
     let totalDevolucion = 0;
@@ -146,6 +146,7 @@ const crearDevolucion = async (req, res, next) => {
           cantidadDevuelta: quantity,
           fechaDevolucion: new Date(),
           invoiceNumber,
+          motivo,
           name: nombreProducto || "",
         });
       }
@@ -173,6 +174,7 @@ const crearDevolucion = async (req, res, next) => {
       motivo,
       invoiceNumber,
       total: montoDev,
+      fechaVentaF:factura.createdAt,
       customerData: factura.clienteData,
       clienteId: factura.clienteId,
       productoD: productos, // Aquí asignamos los productos a la columna productoD
@@ -205,6 +207,20 @@ const crearDevolucion = async (req, res, next) => {
 };
 
 
+const obtenerDevoluciones = async (req, res) => {
+  try {
+    // Obtiene todas las devoluciones de productos
+    const devoluciones = await DevolucionesVentas.find();
+
+    // Calcula la cantidad de productos defectuosos
+    const productosDefectuosos = devoluciones.filter(devolucion => devolucion.estado === 'defectuoso').length;
+
+    // Envía la respuesta al front-end, incluyendo la cantidad de productos defectuosos
+    res.status(200).json({ devoluciones, productosDefectuosos });
+  } catch (error) {
+    res.status(500).json({ error: 'Ocurrió un error al obtener las devoluciones' });
+  }
+};
 
 
 const obtenerDevolucionesVentas = async (req, res, next) => {

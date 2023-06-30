@@ -153,6 +153,7 @@ console.log("TotalF ",TotalF )
       subtotal:subtotalB,
       iva:iva,
       quantity,
+      customerId:cliente.id,
       clienteData: {
         name: cliente.name,
         identification: cliente.identification,

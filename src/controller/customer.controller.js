@@ -42,7 +42,30 @@ const searchCustomer = async (req, res, next) => {
     }
   };
 
+const SearchCustomerById =async(req,res,next)=> {
 
+try{
+const id = req.params.id
+
+const customer = await Customer.findByPk(id)
+if(!customer){
+
+
+return res.status(404).json({message:"Cliente no encontrado"})
+
+}
+
+res.status(200).json(customer)
+
+}catch(err){
+
+  return res.status(500).json(err)
+  next(err)
+}
+
+
+
+}
   //buscar por identifcacion por query
 
   const buscarClientePorIdentificacion = async (req, res, next) => {
@@ -224,7 +247,8 @@ findAllCustomer,
 deleteCustomer,
 numberCustomer,
 searchCustomer,
-buscarClientePorIdentificacion
+buscarClientePorIdentificacion,
+SearchCustomerById
 
 
   }

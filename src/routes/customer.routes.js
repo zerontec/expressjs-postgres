@@ -1,5 +1,5 @@
 const {Router} = require ('express');
-const {buscarClientePorIdentificacion, createCustomer, findAllCustomer, FindCustomertByCedula, searchCustomer, numberCustomer, deleteCustomer, editCustomer } = require('../controller/customer.controller');
+const {buscarClientePorIdentificacion, createCustomer, findAllCustomer, FindCustomertByCedula, searchCustomer, numberCustomer, deleteCustomer, editCustomer, SearchCustomerById } = require('../controller/customer.controller');
 
 
 const router = Router()
@@ -16,6 +16,6 @@ router.delete('/delete/:id', deleteCustomer);
 router.put('/update/:id', editCustomer);
 
 router.get('/search-query', buscarClientePorIdentificacion)
-
+router.get('/search/:id', SearchCustomerById)
 
 module.exports = router

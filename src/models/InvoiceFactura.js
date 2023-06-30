@@ -18,7 +18,15 @@ module.exports = (sequelize) => {
         default:false
 
        },
+ivaTotal:{ 
 
+type:DataTypes.DECIMAL(10, 2),
+
+},
+totalProductosSinIva:{
+    type:DataTypes.DECIMAL(10, 2),
+
+},
           amount: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,

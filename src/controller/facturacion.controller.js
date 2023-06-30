@@ -98,17 +98,28 @@ for (const producto of productos) {
   const subtotalProducto = producto.price * producto.quantity // Calcular el subtotal del producto por cantidad
   console.log("aqui subTotalProduct", subtotalProducto)
   subtotal += subtotalProducto;
+  console.log("subTotaaaaal", subtotal)
 
-  const sinIva = subtotalProducto/1.16
+  const uniSinIva = producto.price /1.16
+  const totalProductosSInIva = subtotal/1.16
+  console.log("totalProductosSInIva", totalProductosSInIva)
+
+ const sinIva = subtotalProducto/1.16
+ console.log("sinIva", sinIva)
  const ivaR = sinIva - subtotal
-  productFactura.push({
+
+
+    productFactura.push({
     name: producto.name,
     quantity: producto.quantity,
     price: producto.price,
     barcode: producto.barcode,
     id: producto.id,
-    subtotal: sinIva, 
-    iva:ivaR
+    
+    preProductoUndSinIva:uniSinIva,  
+    
+   
+   
     
   });
 }
@@ -116,14 +127,17 @@ for (const producto of productos) {
 // const iva = subtotal / ivaRate; // Calcular el IVA
 
 // console.log("aqui iva",iva)
-const subtotalB = subtotal / 1.16
-console.log("subtotalB",subtotalB)
-const resultSubB = subtotalB
+const totalPoducSinIva = subtotal / 1.16
+console.log("totalPoducSinIva",totalPoducSinIva)
+// const parTotalProductoSinIva=parseInt(totalPoducSinIva)
 
-console.log("resultSubB ",resultSubB )
-const iva = subtotal - resultSubB
+const resultSubB = totalPoducSinIva
+const ivaProductosTotal = subtotal - totalPoducSinIva
+
+console.log("resultSubB , ivaProductosTotal",resultSubB, ivaProductosTotal )
+const iva = 1.16
 console.log("Iva ",iva)
-const TotalF = resultSubB + iva
+const TotalF  =+ resultSubB *  iva
 
 console.log("TotalF ",TotalF )
 
@@ -131,6 +145,8 @@ console.log("TotalF ",TotalF )
 
     const totalPrice = TotalF
     let amount = totalPrice;
+
+
     let resEstatus ="";
     if(credit){
       resEstatus ="Pendiente por cobrar"
@@ -150,8 +166,8 @@ console.log("TotalF ",TotalF )
       paymentMethod,
       notes: "",
       amount:totalPrice,
-      subtotal:subtotalB,
-      iva:iva,
+      totalProductosSinIva:parseFloat(totalPoducSinIva),
+      ivaTotal:parseFloat(ivaProductosTotal),
       quantity,
       customerId:cliente.id,
       clienteData: {
@@ -201,6 +217,8 @@ console.log("TotalF ",TotalF )
     await dailySales.save();
     console.log(dailySales);
 
+
+
     await invoiceFactura.save();
 
     const response = {
@@ -212,8 +230,8 @@ console.log("TotalF ",TotalF )
       status: "Pendiente",
       paymentMethod: "Contado",
       notes: "",
-      subtotal:subtotalB,
-      iva:iva,
+      subtotal:totalPoducSinIva,
+      iva:ivaProductosTotal,
       amount,
       cliente: {
         name: cliente.name,
@@ -231,7 +249,7 @@ console.log("TotalF ",TotalF )
         quantity: item.quantity,
         price: item.price,
         id: item.id,
-        iva
+        iva:iva
       })),
     };
 

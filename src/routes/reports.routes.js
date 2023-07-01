@@ -14,6 +14,7 @@ router.get('/daily-report/:startDate/:endDate', generateDailyReport);
 // router.get('/client-purchases/:id', getClientPurchases)
 
 router.get('/client-stat/:id', getClientTotalPurchases)
+
 router.get('/invoices-by-date-range/:startDate/:endDate', getInvoicesByDateRange);
 
 

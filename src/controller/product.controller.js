@@ -6,7 +6,7 @@ const {Op} = require('sequelize');
 // Controlador para crear un nuevo producto
 const createProduct = async (req, res, next) => {
   try {
-    const { name, price, barcode, description, quantity } = req.body;
+    const { name, price, barcode,description, quantity } = req.body;
 
     let existingProduct = await Product.findOne({
       where: { barcode: barcode },
@@ -552,8 +552,8 @@ const deleteProductP = async (req, res, next) => {
       const productos = req.body; // Array de productos a cargar
   
       for (const producto of productos) {
-        const { barcode, quantity, name,description,
-          costo,
+        const { barcode, quantity, name,
+        
           price  } = producto;
   
         // Verificar si el producto ya existe en la base de datos
@@ -571,8 +571,8 @@ const deleteProductP = async (req, res, next) => {
             barcode,
             quantity,
             name,
-            description,
-            costo,
+          
+          
             price
             // Otros campos relevantes del producto
           });

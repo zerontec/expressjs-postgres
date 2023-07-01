@@ -547,6 +547,105 @@ const deleteProductP = async (req, res, next) => {
   
 
 
+  const crearCargaMasivaProductos = async (req, res, next) => {
+    try {
+      const productos = req.body; // Array de productos a cargar
+  
+      for (const producto of productos) {
+        const { barcode, quantity, name,description,
+          costo,
+          price  } = producto;
+  
+        // Verificar si el producto ya existe en la base de datos
+        const productoExistente = await Product.findOne({
+          where: { barcode },
+        });
+  
+        if (productoExistente) {
+          // El producto ya existe, actualizar la cantidad
+          productoExistente.quantity += quantity;
+          await productoExistente.save();
+        } else {
+          // El producto no existe, crear uno nuevo
+          await Product.create({
+            barcode,
+            quantity,
+            name,
+            description,
+            costo,
+            price
+            // Otros campos relevantes del producto
+          });
+        }
+      }
+  
+      res.status(200).json({ message: 'Carga masiva de productos exitosa' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Ocurrió un error al realizar la carga masiva de productos' });
+    }
+  };
+
+
+
+
+  const obtenerEstadisticasProducto = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+  
+      // Obtener el producto
+      const producto = await Product.findByPk(id);
+  
+      if (!producto) {
+        return res.status(404).json({ message: 'Producto no encontrado' });
+      }
+  
+      // Obtener las compras del producto
+      const compras = await Purchase.findAll({
+        include: [
+          {
+            model: Product,
+            as: 'productos',
+            where: { id: id },
+          },
+        ],
+      });
+  
+      // Obtener las ventas del producto
+      const ventas = await InvoiceFactura.findAll({
+        include: [
+          {
+            model: Product,
+            as: 'productos',
+            where: { id: id },
+          },
+
+          
+        ],
+      });
+  
+      // Calcular el total de compras y ventas del producto
+      const totalCompras = compras.reduce((total, compra) => total + compra.total, 0);
+      const totalVentas = ventas.reduce((total, venta) => total + venta.total, 0);
+  
+      // Obtener otros datos estadísticos del producto si es necesario
+  
+      res.status(200).json({
+        producto,
+        compras: compras.length > 0 ? compras : [],
+        ventas: ventas.length > 0 ? ventas : [],
+        totalCompras,
+        totalVentas,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Ocurrió un error al obtener las estadísticas del producto' });
+    }
+  };
+  
+
+
+
 module.exports = {
   createProduct,
   getProducts,
@@ -558,5 +657,7 @@ module.exports = {
   updateProduct,
   getAllQuantity,
   getAllQuantityProduct,
-  getProductStat
+  getProductStat,
+  crearCargaMasivaProductos,
+  obtenerEstadisticasProducto
 };

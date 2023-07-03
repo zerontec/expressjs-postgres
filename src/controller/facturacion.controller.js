@@ -156,12 +156,12 @@ console.log("TotalF ",TotalF )
     const invoiceFactura = await InvoiceFactura.create({
       date: new Date(),
       invoiceNumber,
-      vendedorId: vendedor.codigo,
+      sellerId: vendedor.id,
       clienteId: cliente.identification ,
 
       credit,
       issueDate: null,
-      dueDate,
+      dueDate, 
       status:resEstatus,
       paymentMethod,
       notes: "",
@@ -215,7 +215,7 @@ console.log("TotalF ",TotalF )
     }
     dailySales.amount += totalPrice; // Sumar el totalPrice al monto existente en dailySales
     await dailySales.save();
-    console.log(dailySales);
+    console.log("dayliSales",dailySales);
 
 
 

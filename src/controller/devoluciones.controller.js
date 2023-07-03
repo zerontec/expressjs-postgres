@@ -154,9 +154,14 @@ const crearDevolucion = async (req, res, next) => {
 
     // Sumar las cantidades devueltas al inventario de Product
     for (const producto of productos) {
-      const { id, quantity} = producto;
+      const { barcode,id, quantity} = producto;
 
-      const inventory = await Product.findByPk(id);
+      const inventory = await Product.findOne({
+        where:{
+          barcode:barcode
+        }
+      
+      });
 
       if (inventory) {
         inventory.quantity += quantity;

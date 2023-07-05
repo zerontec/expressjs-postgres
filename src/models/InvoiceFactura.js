@@ -47,6 +47,12 @@ totalProductosSinIva:{
             type: DataTypes.STRING,
             allowNull: true,
           },
+          metodoPago:{
+            type: DataTypes.ARRAY(DataTypes.JSONB),
+
+            allowNull: true,
+
+          },
           notes: {
             type: DataTypes.TEXT,
             allowNull: true,

@@ -37,7 +37,7 @@ async function generateInvoiceNumber() {
 
 const createInvoiceFactura = async (req, res, next) => {
   try {
-    const { quantity, customer, seller, productos, credit, dueDate, paymentMethod } = req.body;
+    const {metodoPago, quantity, customer, seller, productos, credit, dueDate, paymentMethod } = req.body;
 
     // Verificar si el vendedor existe
     const vendedor = await Seller.findOne({
@@ -153,6 +153,8 @@ console.log("TotalF ",TotalF )
 
     }else resEstatus = "cobrada"
 
+    const metodoPagoArray = Array.isArray(metodoPago) ? metodoPago : [];
+
     const invoiceFactura = await InvoiceFactura.create({
       date: new Date(),
       invoiceNumber,
@@ -163,7 +165,8 @@ console.log("TotalF ",TotalF )
       issueDate: null,
       dueDate, 
       status:resEstatus,
-      paymentMethod,
+      // paymentMethod,
+      metodoPago:metodoPagoArray,
       notes: "",
       amount:totalPrice,
       totalProductosSinIva:parseFloat(totalPoducSinIva),
@@ -228,7 +231,7 @@ console.log("TotalF ",TotalF )
       issueDate: null,
       dueDate,
       status: "Pendiente",
-      paymentMethod: "Contado",
+      metodoPago,
       notes: "",
       subtotal:totalPoducSinIva,
       iva:ivaProductosTotal,

@@ -19,6 +19,10 @@ module.exports = (sequelize) => {
         type: DataTypes.JSONB,
         allowNull: true,
       },
+      facturaAfectada:{
+
+        type:DataTypes.STRING
+      },
 
       productosDevueltos: {
         type: DataTypes.TEXT, // Puedes ajustar el tipo de columna según tus necesidades

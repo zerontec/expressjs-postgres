@@ -90,9 +90,41 @@ const obtenerUnaNota = async (req, res, next) => {
   }
 };
 
+
+const deleteNota = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const nota = await NotaCredito.findByPk(id);
+    if (!nota) {
+      return res.status(404).json({ message: "No se encontró el notao" });
+    }
+
+    // // Buscar el inventario del producto
+    // const inventory = await Inventory.findOne({ where: { productId: id } });
+    // if (!inventory) {
+    //   return res.status(404).json({ message: "No se encontró el inventario del producto" });
+    // }
+
+    // Eliminar el producto de la tabla Product
+    await nota.destroy();
+
+    // Eliminar el inventario del producto
+    // await inventory.destroy();
+
+    res.status(200).json({ message: "Noat de credito Eliminad acorrectamente correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Ocurrió un error al eliminar la Nota " });
+  }
+};
+
+
+
 module.exports = {
   crearNotaCredito,
   findAllNota,
   editNota,
   obtenerUnaNota,
+  deleteNota
 };

@@ -146,22 +146,30 @@ const getAllUser = async (req, res, next) => {
  * @returns The user object or an error message.
  */
 
-const getUser = async (req, res, next) => {
-  try {
-    let { id } = req.params;
-    const user = await User.findOne({
-      where: {
-        id,
-      },
-    });
-    return user
-      ? res.status(200).send({ user, message: "User Find" })
-      : res.status(404).send({ message: "User not found" });
-  } catch (err) {
-    res.status(500).send(err, "something went wrong");
-  }
-};
+const SearchUserById =async(req,res,next)=> {
 
+  try{
+  const id = req.params.id
+  
+  const user = await User.findByPk(id)
+  if(!user){
+  
+  
+  return res.status(404).json({message:"Cliente no encontrado"})
+  
+  }
+  
+  res.status(200).json(user)
+  
+  }catch(err){
+  
+    return res.status(500).json(err)
+    next(err)
+  }
+  
+  
+  
+  }
 
 
 
@@ -327,10 +335,11 @@ const deleteMultipleUsers = async (req, res, next) => {
 module.exports = {
   getAllUser,
   createUser,
-  getUser,
+
   putUser,
   deleteUser,
   searchUser,
   serachUserByQuery,
-  deleteMultipleUsers
+  deleteMultipleUsers,
+  SearchUserById
 };

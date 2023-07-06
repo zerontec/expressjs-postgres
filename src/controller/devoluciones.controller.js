@@ -196,7 +196,9 @@ const crearDevolucion = async (req, res, next) => {
       clienteData: factura.clienteData,
       productosDevueltos: JSON.stringify(productos),
       monto: totalDevolucion,
+      facturaAfectada: invoiceNumber,
     });
+
 
     // Actualizar el estado de la devolución
     devolucion.estado = "Completa";

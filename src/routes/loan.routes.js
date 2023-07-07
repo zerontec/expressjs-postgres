@@ -9,6 +9,7 @@ router.get('/get/:id', getLoansBySeller);
 router.post('/create', createLoan);
 router.put('/update/:id', updateLoanStatus);
 router.delete('/delete/:id', deleteLoan);
+// router.delete('/delete/:id', deleteLoan);
 
 
 

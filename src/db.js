@@ -178,11 +178,11 @@ User.belongsToMany(Role, {
 Loan.belongsTo(Seller, { foreignKey: 'sellerId' });
 Seller.hasMany(Loan, { foreignKey: 'sellerId' });
 
-// NotaDebito.belongsTo(DevolucionesCompras, {as: 'devolucionCompra',
-// foreignKey: 'numeroDevolucion'});
+NotaDebito.belongsTo(DevolucionesCompras, {as: 'devolucionCompra',
+foreignKey: 'numeroDevolucion'});
 
 
-DevolucionesCompras.belongsTo(Purchase, { as: 'compra', foreignKey: 'numeroFactura' });
+// DevolucionesCompras.belongsTo(Purchase, { as: 'compra', foreignKey: 'numeroFactura' });
 
 // Asociación entre Product e Purchase
 Product.hasMany(Purchase, { foreignKey: "productId", as: "productPurchases" });

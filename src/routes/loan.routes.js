@@ -7,8 +7,8 @@ const router = Router();
 router.get('/get-all', getAllLoan);
 router.get('/get/:id', getLoansBySeller);
 router.post('/create', createLoan);
-router.put('/update', updateLoanStatus);
-router.delete('/delete', deleteLoan);
+router.put('/update/:id', updateLoanStatus);
+router.delete('/delete/:id', deleteLoan);
 
 
 

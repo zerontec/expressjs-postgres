@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
       
           amount: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
+           
           },
           issueDate: {
             type: DataTypes.DATE,

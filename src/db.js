@@ -147,9 +147,11 @@ const {
   Rating,
   PurcharseOrder,
   buyServices,
-  DevolucionCompras,
+  DevolucionesCompras,
   NotaDebito,
-  ProductosDefectuosos
+  ProductosDefectuosos,
+  DailySales,
+  Loan
   
 } = sequelize.models;
 const ROLES = ["admin", "vendedor", "facturacion"];
@@ -173,13 +175,14 @@ User.belongsToMany(Role, {
 
 
 
+Loan.belongsTo(Seller, { foreignKey: 'sellerId' });
+Seller.hasMany(Loan, { foreignKey: 'sellerId' });
 
-
-NotaDebito.belongsTo(DevolucionCompras, {as: 'devolucionCompra',
+NotaDebito.belongsTo(DevolucionesCompras, {as: 'devolucionCompra',
 foreignKey: 'numeroDevolucion'});
 
 
-DevolucionCompras.belongsTo(Purchase, { as: 'compra', foreignKey: 'numeroFactura' });
+DevolucionesCompras.belongsTo(Purchase, { as: 'compra', foreignKey: 'numeroFactura' });
 
 // Asociación entre Product e Purchase
 Product.hasMany(Purchase, { foreignKey: "productId", as: "productPurchases" });
@@ -187,6 +190,30 @@ Purchase.belongsTo(Product, { foreignKey: "productId" });
 
 Purchase.hasMany(Product, { as: 'products' });
 Product.belongsTo(Purchase, { as: 'purchase' });
+
+
+Purchase.hasMany(Product, { as: 'productos', foreignKey: 'purchaseId' });
+
+
+// sequelize.models.invoiceFactura.belongsTo(sequelize.models.Seller, {
+//   foreignKey: 'sellerId',
+// });
+
+
+
+
+// InvoiceFactura.belongsToMany(Product, {
+//   through: InvoiceProduct,
+//   as: 'products',
+//   foreignKey: 'invoiceFacturaId',
+// });
+
+// Product.belongsToMany(InvoiceFactura, {
+//   through: InvoiceProduct,
+//   as: 'invoiceFacturas',
+//   foreignKey: 'productId',
+// });
+
 
 
 // Asociación entre Supplier y Purchase
@@ -235,8 +262,13 @@ AccountsReceivable.belongsTo(InvoiceFactura, {
   foreignKey: "invoiceFacturaId",
 });
 
-// Customer.hasMany(Purchase);
-// Purchase.belongsTo(Customer);
+Supplier.hasMany(Purchase,{
+foreignKey: "supplierId",
+  as: "supplier",
+
+});
+Purchase.belongsTo(Customer);
+
 Inventory.belongsTo(Supplier, {
   foreignKey: "supplierId",
   as: "supplier",
@@ -285,6 +317,12 @@ ProductosDefectuosos.belongsTo(Product, {
   foreignKey: 'productId',
   as: 'product',
 });
+
+
+// InvoiceFactura.belongsTo(DailySales, {
+//   foreignKey: 'dailySalesId', // Reemplaza 'dailySalesId' con el nombre de la columna en la tabla InvoiceFactura que referencia a DailySales
+//   as: 'dailySales', // Opcionalmente, puedes establecer un alias para la asociación
+// });
 
 NotaCredito.belongsTo(Customer, { foreignKey: "clienteId" }); // Reemplaza 'Cliente' con el modelo correspondiente a tu entidad de Cliente
 // // Definir las relaciones con otros modelos

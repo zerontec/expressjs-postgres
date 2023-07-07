@@ -76,30 +76,50 @@ const getLoansBySeller = async (req, res, next) => {
 };
 
 const updateLoanStatus = async (req, res, next) => {
-  try {
-    const { loanId } = req.params;
-    const { status } = req.body;
-
-    const loan = await Loan.findByPk(loanId);
-
-    if (!loan) {
-      return res.status(404).json({ message: 'Préstamo no encontrado' });
+    try {
+      const { id } = req.params;
+      const { status,  notes, amount } = req.body;
+  
+      const loan = await Loan.findByPk(id)
+  
+      if (!loan) {
+        return res.status(404).json({ message: 'Préstamo no encontrado' });
+      }
+  
+      loan.status = status;
+      loan.notes = notes
+      loan.amount=amount
+  
+      // Actualizar el monto solo si se proporciona en el cuerpo de la solicitud
+      if (amount !== undefined) {
+        loan.amount = amount;
+      }
+  
+      await loan.save();
+  
+      // Obtener la suma total de las deudas del vendedor
+      const sellerId = loan.sellerId;
+      const totalDebt = await Loan.sum('amount', {
+        where: {
+          sellerId,
+          status: 'pendiente'
+        }
+      });
+  
+      res.status(200).json({ loan, totalDebt });
+    } catch (error) {
+      res.status(500).json({ message: 'Error al actualizar el estado del préstamo' });
+   next(error)
+    
     }
-
-    loan.status = status;
-    await loan.save();
-
-    res.status(200).json(loan);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el estado del préstamo' });
-  }
-};
+  };
+  
 
 const deleteLoan = async (req, res, next) => {
   try {
-    const { loanId } = req.params;
+    const { id } = req.params;
 
-    const loan = await Loan.findByPk(loanId);
+    const loan = await Loan.findByPk(id);
 
     if (!loan) {
       return res.status(404).json({ message: 'Préstamo no encontrado' });

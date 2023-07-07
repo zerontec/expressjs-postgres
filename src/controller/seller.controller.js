@@ -185,9 +185,8 @@ const getSalesStats = async (req, res, next) => {
 
     // Consultar las ventas del vendedor para la semana actual
     const weekSales = await InvoiceFactura.sum('amount', {
-     
       where: {
-        sellerId:sellerId,
+        sellerId,
         date: {
           $gte: startOfWeek,
           $lt: endOfWeek
@@ -198,8 +197,7 @@ const getSalesStats = async (req, res, next) => {
     // Consultar las ventas del vendedor para el mes actual
     const monthSales = await InvoiceFactura.sum('amount', {
       where: {
-        sellerId:sellerId,
-       sellerId,
+        sellerId,
         date: {
           $gte: startOfMonth,
           $lt: endOfMonth
@@ -231,28 +229,66 @@ const getProductsBySeller = async (req, res, next) => {
     // Obtener los productos vendidos por el vendedor
     const products = await InvoiceFactura.findAll({
       where: {
-       sellerId,
+        sellerId,
       },
-      attributes: ['productoFactura'],
+      attributes: ['productoFactura', 'invoiceNumber', 'date'],
       include: [{ model: Seller }],
     });
 
     // Crear una lista de los productos vendidos
     const productList = [];
     products.forEach((invoice) => {
-      const { productoFactura } = invoice;
+      const { productoFactura, invoiceNumber } = invoice;
       productoFactura.forEach((product) => {
-        productList.push(product);
+        productList.push({ ...product, invoiceNumber });
       });
     });
 
     res.status(200).json({ seller, products: productList });
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener los productos del vendedor', error });
-  next(error)
+    next(error);
   }
 };
 
+const deleteSoldProduct = async (req, res, next) => {
+  try {
+    const { id, productId } = req.params;
+
+    // Verificar si el vendedor existe
+    const seller = await Seller.findByPk(id);
+    if (!seller) {
+      return res.status(404).json({ message: 'Vendedor no encontrado' });
+    }
+
+    // Verificar si el producto existe y pertenece al vendedor
+    const product = await InvoiceFactura.findOne({
+      where: {
+        id,
+        'productoFactura.productId': productId,
+      },
+    });
+    if (!product) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Eliminar el producto vendido
+    await InvoiceFactura.update(
+      { 'productoFactura.$': null },
+      {
+        where: {
+          sellerId,
+          'productoFactura.productId': productId,
+        },
+      }
+    );
+
+    res.status(200).json({ message: 'Producto vendido eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar el producto vendido', error });
+    next(error);
+  }
+};
 
 
 
@@ -265,5 +301,6 @@ module.exports = {
   deleteSeller,
   searchSellerByCode,
   getProductsBySeller,
-  getSalesStats
+  getSalesStats,
+  deleteSoldProduct
 };

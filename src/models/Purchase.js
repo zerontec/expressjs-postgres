@@ -65,7 +65,7 @@ type:DataTypes.STRING
         type:DataTypes.STRING
       },
       productDetails: {
-        type: DataTypes.JSONB, // O DataTypes.JSON si no tienes soporte para JSONB
+        type: DataTypes.ARRAY(DataTypes.JSONB),
         allowNull: true,
       },
 

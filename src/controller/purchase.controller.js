@@ -66,7 +66,7 @@ const createPurchase = async (req, res, next) => {
       supplierName: supplier.name,
       supplierAddress: supplier.address,
       supplierPhone: supplier.phone,
-      productDetails: JSON.stringify(products), // Convertir el array de objetos a JSON
+      productDetails: products, // Convertir el array de objetos a JSON
     });
 
 
@@ -100,6 +100,8 @@ const newProducts = [];
       name
     });
     newProducts.push(createdProduct);
+     // Asociar el producto a la compra
+     await createdProduct.setPurchase(newPurchase);
   }
   await newPurchase.setProducts(newProducts);
       // Verificar si el producto existe en la tabla de productos
@@ -135,7 +137,7 @@ const newProducts = [];
     newPurchase.totalAmount = totalAmount;
     await newPurchase.save();
 
-    // Resto del código...
+  
 
    
     // Crear la cuenta por pagar asociada a la compra y al proveedor

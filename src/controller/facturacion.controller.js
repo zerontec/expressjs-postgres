@@ -159,7 +159,9 @@ console.log("TotalF ",TotalF )
       date: new Date(),
       invoiceNumber,
       sellerId: vendedor.id,
+
       clienteId: cliente.identification ,
+
 
       credit,
       issueDate: null,
@@ -180,6 +182,7 @@ console.log("TotalF ",TotalF )
       },
       vendedorData: {
         codigo: vendedor.codigo,
+        name: vendedor.name
       },
       productoFactura: productFactura,
     });
@@ -195,6 +198,7 @@ console.log("TotalF ",TotalF )
         status: "Pendiente",
         paymentMethod,
         notes,
+      
         clienteDataC: {
           name: cliente.name,
           identification: cliente.identification,
@@ -205,7 +209,8 @@ console.log("TotalF ",TotalF )
         },
         montoCobrar: amount,
       });
-
+      
+      
       // Asociar la cuenta por cobrar con la factura
       invoiceFactura.setAccountsReceivable(accountsReceivable);
     }

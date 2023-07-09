@@ -17,15 +17,20 @@ const createProductd = async (req, res, next) => {
     if (!existingProduct) {
       // Crear el producto en la tabla de productos
       existingProduct = await ProductosDefectuosos.create({
+        barcode,
         name: name,
         invoiceNumber,
-        barcode,
+        
         cantidadDevuelta,
-        quantity,
+       
         fechaDevolucion
       });
     } else {
-      // Incrementar la cantidad del producto en la tabla de productos
+      
+        // Incrementar la cantidad del producto en la tabla de productos
+      
+            
+
       return res
         .status(409)
         .json({ messague: "Ya existe un producto con ese codigo " });

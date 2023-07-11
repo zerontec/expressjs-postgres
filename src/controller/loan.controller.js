@@ -1,4 +1,5 @@
-const {Loan, Seller} = require('../db');
+const {Loan, Seller, Payment} = require('../db');
+
 
 // const createLoan = async (req, res, next) => {
 //   try {
@@ -156,12 +157,109 @@ const getSellerDebt = async (req, res, next) => {
     }
   };
   
+  // Abonos 
 
+  const createPayment = async (req, res, next) => {
+    try {
+      const { loanId, amount, paymentDate } = req.body;
+  
+      const loan = await Loan.findByPk(loanId);
+  
+      if (!loan) {
+        return res.status(404).json({ message: 'Préstamo no encontrado' });
+      }
+  
+      // Realizar validaciones adicionales, como verificar que el monto del abono sea válido
+  
+      const remainingAmount = loan.amount - amount;
+  
+      if (remainingAmount < 0) {
+        return res.status(400).json({ message: 'El monto del abono excede el monto del préstamo' });
+      }
+  
+      // Actualizar el monto del préstamo y el estado si corresponde
+      loan.amount = remainingAmount;
+      if (remainingAmount === 0) {
+        loan.status = 'pagada';
+      }
+  
+      await loan.save();
+  
+      // Guardar el abono en el modelo Payment
+      const payment = await Payment.create({
+        loanId,
+        amount,
+        paymentDate,
+        sellerId:loan.sellerId
+      });
+  
+      res.status(201).json({ message: 'Abono realizado exitosamente', loan, payment });
+    } catch (error) {
+      res.status(500).json({ message: 'Error al realizar el abono' });
+      next(error);
+    }
+  };
+  
+
+
+  const updatePayment = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { amount, paymentDate } = req.body;
+  
+      const payment = await Payment.findByPk(id);
+  
+      if (!payment) {
+        return res.status(404).json({ message: 'Abono no encontrado' });
+      }
+  
+      payment.amount = amount;
+      payment.paymentDate = paymentDate;
+  
+      await payment.save();
+  
+      res.status(200).json(payment);
+    } catch (error) {
+      res.status(500).json({ message: 'Error al actualizar el abono' });
+      next(error);
+    }
+  };
+  const getCompletedPayments = async (req, res, next) => {
+    try {
+      const completedPayments = await Payment.findAll();
+  
+      // Obtener los vendedores o empleados asociados a las deudas
+      const sellerIds = completedPayments.map(payment => payment.sellerId);
+      const sellers = await Seller.findAll({
+        where: { id: sellerIds },
+      });
+  
+      // Agregar la información de los vendedores o empleados a los abonos realizados
+      const paymentsWithSeller = completedPayments.map(payment => {
+        const seller = sellers.find(seller => seller.id === payment.sellerId);
+        return {
+          ...payment.toJSON(),
+          seller: seller ? seller.toJSON() : null,
+        };
+      });
+  
+      res.status(200).json(paymentsWithSeller);
+    } catch (error) {
+      res.status(500).json({ message: 'Error al obtener los abonos realizados' });
+      next(error);
+    }
+  };
+  
+  
+  
 module.exports = {
   createLoan,
   getLoansBySeller,
   updateLoanStatus,
   deleteLoan,
   getAllLoan,
-  getSellerDebt
+  getSellerDebt,
+  createPayment,
+  updatePayment,
+  getCompletedPayments
 };

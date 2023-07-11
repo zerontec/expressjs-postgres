@@ -27,7 +27,7 @@ const getDailySales = async (req, res, next) => {
       totalSales = result.dataValues.totalSales;
     }
 
-    res.status(200).json(totalSales);
+    res.status(200).json({message:"ventas de el dia", totalSales});
 
     console.log(totalSales);
   } catch (error) {

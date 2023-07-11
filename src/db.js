@@ -22,8 +22,8 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 })
 
-// Connect to the database using the DATABASE_URL environment
-//   variable injected by Railway
+// // Connect to the database using the DATABASE_URL environment
+// //   variable injected by Railway
 
 
 
@@ -151,7 +151,8 @@ const {
   NotaDebito,
   ProductosDefectuosos,
   DailySales,
-  Loan
+  Loan,
+  Payment
   
 } = sequelize.models;
 const ROLES = ["admin", "vendedor", "facturacion"];
@@ -173,6 +174,8 @@ User.belongsToMany(Role, {
 
 // Purchase.hasMany(Product, { as: 'productos', foreignKey: 'purchaseId' });
 
+Payment.belongsTo(Loan, { foreignKey: 'loanId' });
+Loan.hasMany(Payment, { foreignKey: 'loanId' });
 
 
 Loan.belongsTo(Seller, { foreignKey: 'sellerId' });

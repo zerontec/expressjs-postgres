@@ -105,12 +105,28 @@ verifyToken = (req, res, next) => {
     });
   };
 
+  const isAdminOrFacturacion = (req, res, next) => {
+    User.findByPk(req.userId).then((user) => {
+      user.getRoles().then((roles) => {
+        const roleNames = roles.map((role) => role.name);
+        if (roleNames.includes("admin") || roleNames.includes("facturacion")) {
+          next();
+        } else {
+          res.status(403).send({
+            message: "Require Admin or Facturacion Role!",
+          });
+        }
+      });
+    });
+  };
+
   const authJwt = {
     verifyToken: verifyToken,
     isAdmin: isAdmin,
     isUserGl: isUserGl,
     isUserTl: isUserTl,
-    isGlOrTl: isGlOrTl
+    isGlOrTl: isGlOrTl,
+    isAdminOrFacturacion :isAdminOrFacturacion
   };
   module.exports = authJwt;
   

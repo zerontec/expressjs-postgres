@@ -152,7 +152,8 @@ const {
   ProductosDefectuosos,
   DailySales,
   Loan,
-  Payment
+  Payment,
+  SalesClosure
   
 } = sequelize.models;
 const ROLES = ["admin", "vendedor", "facturacion"];

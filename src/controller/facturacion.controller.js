@@ -155,6 +155,11 @@ console.log("TotalF ",TotalF )
 
     const metodoPagoArray = Array.isArray(metodoPago) ? metodoPago : [];
 
+    const metodoPagoWithChange = metodoPagoArray.map((item) => ({
+      ...item,
+      change: item.amount - item.changeAmount, // Calcular el cambio restando el monto pagado al monto de la factura
+    }));
+
     const invoiceFactura = await InvoiceFactura.create({
       date: new Date(),
       invoiceNumber,
@@ -168,7 +173,8 @@ console.log("TotalF ",TotalF )
       dueDate, 
       status:resEstatus,
       // paymentMethod,
-      metodoPago:metodoPagoArray,
+     metodoPago: metodoPagoWithChange,
+      // change:change,
       notes: "",
       amount:totalPrice,
       totalProductosSinIva:parseFloat(totalPoducSinIva),

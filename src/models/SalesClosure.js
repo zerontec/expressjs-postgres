@@ -14,5 +14,13 @@ module.exports = (sequelize) => {
             type: DataTypes.JSON,
             allowNull: false,
           },
+          creditSales:{
+            type: DataTypes.DECIMAL(10, 2),
+            
+
+
+          }
+
+
         });
 };

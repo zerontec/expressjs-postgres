@@ -138,88 +138,65 @@ const createPayment = async (req, res, next) => {
         .status(400)
         .json({ message: "La cuenta por pagar no existe o ya ha sido pagada" });
     }
-    let abonado = parseFloat(accountPayable.abonos) || 0;
-    console.log("accountPayable.abonado", abonado);
-    // Calcular el saldo pendiente restando los abonos anteriores
-    const montos = parseFloat(accountPayable.amount) || 0;
-    console.log("montos", montos);
 
-    let saldosPendientes = parseFloat(accountPayable.saldoPendiente) || 0;
+    const abonos = parseFloat(accountPayable.abonos) || 0;
+    let saldoPendientes = parseFloat(accountPayable.saldoPendiente) || 0;
+    const montoTotal = parseFloat(accountPayable.amount) || 0;
 
-    if (abonado === 0) {
-      saldosPendientes = montos - montoPagado;
-    } else {
-      saldosPendientes -= montoPagado;
+    // Verificar si el monto pagado es válido
+    if (montoPagado <= 0) {
+      return res.status(400).json({ message: "El monto pagado debe ser mayor a cero" });
     }
 
-    console.log("accountPayable.abonos2", abonado);
+    // Verificar si el monto pagado excede el saldo pendiente
+    if (montoPagado > accountPayable.amount  && montoPagado !== saldoPendientes) {
+      return res.status(400).json({ message: "El monto pagado excede el saldo pendiente de la cuenta por pagar" });
+    }
 
-    console.log("saldoPendientes1", saldosPendientes);
+    let nuevoSaldoPendiente=0;
+    // Calcular el nuevo saldo pendiente y los nuevos abonos
+    const nuevoAbono = abonos + montoPagado;
+    console.log("nuevoAbono ",nuevoAbono )
+      if(saldoPendientes=== 0){
+         nuevoSaldoPendiente= accountPayable.amount-montoPagado
 
-    console.log("saldoPendiente2", saldosPendientes);
+      }else{
 
-    // saldoPendiente = montos - abonado;
-    console.log("saldoPendiente", saldosPendientes);
-
-    if (montoPagado <= saldosPendientes) {
-      // Actualizar el saldo de la cuenta por pagar
-      abonado += montoPagado;
-
-      // Verificar si el saldo pendiente es igual al monto pagado para marcar la cuenta como pagada
-      if (saldosPendientes === montoPagado) {
-        accountPayable.status = "pagada";
-
-        // Obtener la lista de compras asociada a la cuenta por pagar
-        // const purchase = await Purchase.findOne({
-        //   where: { id: accountPayable.purchase.id },
-        // });
-
-        // Verificar si la compra existe y no ha sido pagada anteriormente
-        // if (purchase && purchase.status !== "pagada") {
-        //   // Actualizar el estado de la compra a pagada
-        //   purchase.status = "pagada";
-        //   await purchase.save();
-        // }
+         nuevoSaldoPendiente = saldoPendientes - montoPagado;
       }
+      
 
-      accountPayable.saldoPendiente = saldosPendientes.toFixed(2);
+   
+    console.log("nuevoSaldoPendiente ",nuevoSaldoPendiente)
+    // Actualizar el saldo pendiente y los abonos en la cuenta por pagar
+    accountPayable.abonos = nuevoAbono.toFixed(2);
+    accountPayable.saldoPendiente = nuevoSaldoPendiente.toFixed(2);
+    await accountPayable.save();
 
-      accountPayable.abonos = abonado.toFixed(2);
-      console.log(" accountPayable.abonos3", accountPayable.abonos);
-      // Guardar los cambios en la cuenta por pagar
-      await accountPayable.save({
-        abonos: abonado,
-        saldoPendiente: saldosPendientes,
-      });
-
-      // Crear el pago en la base de datos
-      const payment = await PagoCompras.create({
-        proveedor,
-        montoPagado,
-        fechaPago,
-
-        compraId, // Asignar el ID de la compra al campo de clave externa
-      });
-
-      // Respuesta exitosa
-      res.status(201).json({ message: "Pago creado exitosamente", payment });
-    } else {
-      // El monto pagado excede el saldo pendiente
-      res
-        .status(400)
-        .json({
-          message:
-            "El monto pagado excede el saldo pendiente de la cuenta por pagar",
-        });
+    // Verificar si la cuenta por pagar ha sido totalmente pagada
+    if (nuevoSaldoPendiente === 0) {
+      accountPayable.status = "pagada";
+      await accountPayable.save();
     }
+
+    // Crear el pago en la base de datos
+    const payment = await PagoCompras.create({
+      proveedor,
+      montoPagado,
+      fechaPago,
+      compraId, // Asignar el ID de la compra al campo de clave externa
+    });
+
+    // Respuesta exitosa
+    res.status(201).json({ message: "Pago creado exitosamente", payment });
   } catch (error) {
     // Error al crear el pago
-    res
-      .status(500)
-      .json({ message: "Error al crear el pago de la cuenta por pagar" });
+    res.status(500).json({ message: "Error al crear el pago de la cuenta por pagar" });
     next(error);
   }
-}
+};
+
+
 
 
 

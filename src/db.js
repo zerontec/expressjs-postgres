@@ -14,17 +14,34 @@ const {
 const  pg = require("pg");
 const { Pool } = require('pg')
  
-const pool = new Pool({
-  host: 'localhost',
-  user: 'database-user',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-})
+// const pool = new Pool({
+//   host: 'localhost',
+//   user: 'postgres',
+//   max: 20,
+//   idleTimeoutMillis: 30000,
+//   connectionTimeoutMillis: 2000,
+// })
 
 // // Connect to the database using the DATABASE_URL environment
 // //   variable injected by Railway
+// // Establece la función de escucha para recibir notificaciones
+// pool.connect((err, client, done) => {
+//   if (err) {
+//     console.error('Error al conectar con la base de datos:', err);
+//     return;
+//   }
+//     // Establece la función de escucha para recibir notificaciones
+//     client.on('notification', (msg) => {
+//       console.log('Notificación recibida:', msg);
+//       // Aquí puedes enviar la notificación a los clientes conectados a través de WebSockets o EventSource
+//     });
+  
+//   // Suscríbete a un canal de notificaciones
+//   client.query('LISTEN channel_name');
 
+//   // Marca la conexión como completada
+//   done();
+// });
 
 
 // let sequelize =
@@ -153,7 +170,9 @@ const {
   DailySales,
   Loan,
   Payment,
-  SalesClosure
+  SalesClosure,
+  PaidAccount,
+  PagoCompras
   
 } = sequelize.models;
 const ROLES = ["admin", "vendedor", "facturacion"];
@@ -181,6 +200,8 @@ Loan.hasMany(Payment, { foreignKey: 'loanId' });
 
 Loan.belongsTo(Seller, { foreignKey: 'sellerId' });
 Seller.hasMany(Loan, { foreignKey: 'sellerId' });
+
+PagoCompras.belongsTo(AccountPayable, { foreignKey: 'compraId' });
 
 // NotaDebito.belongsTo(DevolucionesCompras, {as: 'devolucionCompra',
 // foreignKey: 'numeroDevolucion'});

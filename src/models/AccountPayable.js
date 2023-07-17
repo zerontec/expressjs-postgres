@@ -47,6 +47,16 @@ module.exports = (sequelize) => {
       type:DataTypes.STRING
 
     },
+    abonos:{
+type:DataTypes.DECIMAL(10,2)
+
+    },
+
+    saldoPendiente:{
+
+      type:DataTypes.DECIMAL(10,2)
+
+    },
 
 
     createdAt: {

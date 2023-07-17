@@ -14,13 +14,13 @@ const {
 const  pg = require("pg");
 const { Pool } = require('pg')
  
-// const pool = new Pool({
-//   host: 'localhost',
-//   user: 'postgres',
-//   max: 20,
-//   idleTimeoutMillis: 30000,
-//   connectionTimeoutMillis: 2000,
-// })
+const pool = new Pool({
+  host: 'localhost',
+  user: 'postgres',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+})
 
 // // Connect to the database using the DATABASE_URL environment
 // //   variable injected by Railway

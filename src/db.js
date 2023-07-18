@@ -172,7 +172,8 @@ const {
   Payment,
   SalesClosure,
   PaidAccount,
-  PagoCompras
+  PagoCompras,
+  Expense
   
 } = sequelize.models;
 const ROLES = ["admin", "vendedor", "facturacion"];

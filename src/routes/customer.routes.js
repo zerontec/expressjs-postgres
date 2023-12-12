@@ -2,7 +2,6 @@ const {Router} = require ('express');
 const {buscarClientePorIdentificacion, createCustomer, findAllCustomer, FindCustomertByCedula, searchCustomer, numberCustomer, deleteCustomer, editCustomer, SearchCustomerById } = require('../controller/customer.controller');
 const authJwt = require('../middleware/authJwt');
 
-
 const router = Router()
 
 

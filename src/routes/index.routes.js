@@ -22,6 +22,8 @@ const defectusosRoutes = require('./productDefe.routes')
 const loanRoutes = require('./loan.routes')
 const salesResportRoutes = require('./salesReport.routes')
 const expenseRoutes = require('./expeses.routes');
+const taskRoutes = require('./task.routes.js')
+
 // const syncDataRoutes = require('./syncData.routes');
 const URL = "/api/"
 
@@ -48,6 +50,7 @@ router.use(`${URL}loan`, loanRoutes);
 router.use(`${URL}dayli`, salesResportRoutes);
 router.use(`${URL}consulta`, dollarRoutes);
 router.use(`${URL}expenses`, expenseRoutes);
+router.use(`${URL}task`, taskRoutes);
 
 
 module.exports = router;

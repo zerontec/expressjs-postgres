@@ -2,7 +2,7 @@ const {DataTypes} = require ('sequelize');
 
 module.exports = (sequelize) => {
 
-    sequelize.define('user',{
+  const User =   sequelize.define('user',{
         name:{
 
             type: DataTypes.STRING,
@@ -41,6 +41,13 @@ module.exports = (sequelize) => {
 
         },
 
+        telephone:{
+
+            type:DataTypes.STRING,
+
+        },
+
+     
         address:{
 
             type:DataTypes.STRING,
@@ -57,8 +64,13 @@ module.exports = (sequelize) => {
         }
 
 
-
     })
+    User.prototype.removeTarea = function (tarea) {
+        return this.removeTareas(tarea);
+      }
 
+      User.prototype.addHistorialTask = function (tarea) {
+        return this.addHistorialTareasTerminadas(tarea);
+      };
 
 }

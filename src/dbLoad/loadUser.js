@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { Role, User } = require("../db");
 
-const defaultAdminAndRoles = async () => {
+const defaultAdminAndRoles = async (req, res, next) => {
   try {
     const roldb = await Role.findAll();
     if (roldb.length === 0) {
@@ -12,7 +12,7 @@ const defaultAdminAndRoles = async () => {
 
       const rolUserTl = await Role.create({
         id: 2,
-        name: "vendedor",
+        name: "tecnico",
       });
 
       const rolUserGl = await Role.create({
@@ -30,9 +30,9 @@ const defaultAdminAndRoles = async () => {
     });
     if ("!userdb") {
       const user = await User.create({
-        name: "AdminGlove",
-        username: "adminGL",
-        email: "admin@glove.com",
+        name: "AdminTrack",
+        username: "zeroncold",
+        email: "admin@gzeroncold.com",
         password: bcrypt.hashSync("admin", 10),
       });
       await user.addRoles(1);

@@ -173,10 +173,15 @@ const {
   SalesClosure,
   PaidAccount,
   PagoCompras,
-  Expense
+  Expense,
+  HistorialTareasTerminadas,
+
+Task,
+HistorialGeneral
+
   
 } = sequelize.models;
-const ROLES = ["admin", "vendedor", "facturacion"];
+const ROLES = ["admin", "tecnico", "facturacion"];
 
 Role.belongsToMany(User, {
   through: "user_roles",
@@ -192,7 +197,74 @@ User.belongsToMany(Role, {
 // Product.hasOne(Inventory, { foreignKey: "productId", as: "productInventory" });
 // Inventory.belongsTo(Product, { foreignKey: "productId" });
 
+User.hasMany(Task, { foreignKey: 'tecnico_id', as: 'tareasAsignadas' });
+User.hasMany(Task, { foreignKey: 'tecnico_id', as: 'historialTareasTerminadas' });
+User.hasMany(Task, { foreignKey: 'tecnico_id', as:'tareasComoTecnico' });
+User.hasMany(Task, { foreignKey: 'tecnico_id', as: 'tareas' });
 
+
+
+
+User.hasMany(HistorialTareasTerminadas, { foreignKey: 'tecnico_id', as: 'historialTareasTerminadasU' });
+     
+Customer.hasMany(HistorialTareasTerminadas, { foreignKey: 'cliente_id', as: 'historialTareasTerminadasS' });
+
+HistorialTareasTerminadas.belongsTo(Customer, {
+ foreignKey: 'cliente_id',
+ as: 'cliente',
+
+})
+
+Task.belongsTo(HistorialTareasTerminadas, {
+  foreignKey: 'historialTareasTerminadasId',
+  as: 'historialTareasTerminadasS',
+});
+ 
+
+HistorialTareasTerminadas.belongsTo(User, {
+  foreignKey: 'tecnico_id',
+  as: 'tecnico',
+
+})
+
+HistorialTareasTerminadas.belongsTo(Task, {
+  foreignKey: 'tecnico_id',
+  as: 'tarea',
+
+})
+HistorialTareasTerminadas.belongsTo(Customer, {
+  foreignKey: 'tecnico_id',
+  as: 'clienteA',
+
+})
+
+
+
+    // Relación con Clientes
+    Task.belongsTo(Customer, { foreignKey: 'cliente_id' });
+  
+    // Relación con Taks.
+    Customer.hasMany(Task, { foreignKey: 'cliente_id' });
+
+
+  //   Customer.belongsTo(User, {foreignKey:'identification'})
+  // User .hasMany(Customer, {foreignKey: 'identification'} )
+    
+
+    Task.belongsTo(User, {foreignKey: 'tecnico_id',as :'tecnico',})
+  
+    Task.belongsTo(User, { foreignKey: 'cliente_id', as: 'cliente' });
+    
+    Task.belongsTo(HistorialGeneral, {
+      foreignKey: 'historialGeneralId',
+      as: 'historialGeneral',
+    });
+
+    Task.belongsTo(HistorialTareasTerminadas, {
+      foreignKey: 'historialTareasTerminadasId',
+      as: 'historialTareasTerminadas',
+    });
+   
 // Purchase.hasMany(Product, { as: 'productos', foreignKey: 'purchaseId' });
 
 Payment.belongsTo(Loan, { foreignKey: 'loanId' });

@@ -44,15 +44,15 @@ const pool = new Pool({
 // });
 
 
-// let sequelize =
+// const sequelize =
 //   process.env.NODE_ENV === "development"
 //     ? new Sequelize({
-//         database: DB_NAME,
+//         database: 'track',
 //         dialect: "postgres",
-//         host: DB_HOST,
+//         host: 'track',
 //         port: 5432,
-//         username: DB_USER,
-//         password: DB_PASSWORD,
+//         username: 'postgres',
+//         password: '97124',
 //         pool: {
 //           max: 3,
 //           min: 1,
@@ -66,19 +66,21 @@ const pool = new Pool({
 //           idle: 10000, // Tiempo máximo en milisegundos que una conexión puede estar inactiva antes de ser liberada
 //         },
 //         dialectOptions: {
-//           ssl: {
-//             require: true,
-//             // Ref.: https://github.com/brianc/node-postgres/issues/2009
-//             rejectUnauthorized: false,
-//           },
+//           // ssl: {
+//           //   require: true,
+//           //   // Ref.: https://github.com/brianc/node-postgres/issues/2009
+//           //   rejectUnauthorized: false,
+//           //   native:true
+//           // },
 //           keepAlive: true,
 //         },
 //         ssl: true,
 //       })
 //     : new Sequelize(
-//         `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/munecadb`,
+//         `postgres://postgres:97124@localhost/track`,
 //         { logging: false, native: false }
 //       );
+
 
 
 
@@ -110,6 +112,8 @@ let sequelize =
         `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`,
         { logging: false, native: false }
       );
+
+
 
 
 const basename = path.basename(__filename);

@@ -41,10 +41,11 @@ const registerUser = async (req, res, next) => {
     })
     .catch((err) => {
       res.status(500).send({ message: err.message });
+      next(err)
     });
 };
 
-const loginUser = (req, res) => {
+const loginUser = (req, res, next) => {
   User.findOne({
     where: {
       username: req.body.username,

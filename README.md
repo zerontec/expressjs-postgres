@@ -209,7 +209,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@zeronleo](https://twitter.com/zeronleo) - devsignweb@gmail.com -leobertozeron@gmail.com
+Leo Zeron - [@zeronleo](https://twitter.com/zeronleo) - devsignweb@gmail.com -leobertozeron@gmail.com
 
 Project Link: [https://github.com/zerontec/deskGledah](https://github.com/zerontec/deskGledah)
 

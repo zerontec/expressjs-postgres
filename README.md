@@ -219,7 +219,24 @@ Project Link: [https://github.com/zerontec/deskGledah](https://github.com/zeront
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
+Used technology
+This project has been developed using the following technologies:
 
+* JavaScript: Main programming language used in the project.
+* Node.js: JavaScript runtime environment that allows you to run JavaScript code on the server.
+* Express.js: framework used to build the project's web API.
+* PostgreSQL: Relational database management system used to store and manage project data.
+
+Libraries and Dependencies
+The project also uses various libraries and dependencies that have contributed to its development and operation:
+
+bcrypt: Library for password hashing.
+jsonwebtoken: Library for creating and verifying JWT tokens.
+Sequelize: ORM (Object-Relational Mapping) used to interact with the PostgreSQL database.
+Thanks
+I want to express my gratitude to the developer community and maintainers of the libraries and tools mentioned above. I also want to thank anyone who has contributed, reported problems, suggested improvements, or used this project in any way.
+
+This project would not be possible without the help and support of the open source community. Thank you all!
 <!--
 * [Choose an Open Source License](https://choosealicense.com)
 
